@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using DictionaryApi;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,16 +20,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Adds /register, /login and /refresh endpoints
 app.MapIdentityApi<User>();
 
-app.MapGet("/", (ClaimsPrincipal user) => $"Hello {user.Identity!.Name}").RequireAuthorization();
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
