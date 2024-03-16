@@ -8,8 +8,9 @@ builder.Services.AddAuthentication()
     .AddBearerToken(IdentityConstants.BearerScheme);
 builder.Services.AddAuthorizationBuilder();
 
+var connectionString = builder.Configuration.GetConnectionString("DictionaryDb");
 builder.Services.AddDbContext<DictionaryDbContext>(options => 
-    options.UseInMemoryDatabase("DictionaryDb"));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<DictionaryDbContext>()
