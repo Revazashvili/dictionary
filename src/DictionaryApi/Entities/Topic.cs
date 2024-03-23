@@ -1,8 +1,8 @@
-namespace DictionaryApi.Models;
+namespace DictionaryApi.Entities;
 
-public class SubTopic
+public class Topic
 {
-    public SubTopic(int id, IEnumerable<Translation> nameTranslations)
+    public Topic(Guid id, IEnumerable<Translation> nameTranslations)
     {
         if (!nameTranslations.Any())
             throw new ArgumentNullException(nameof(nameTranslations));
@@ -10,8 +10,8 @@ public class SubTopic
         Id = id;
         NameTranslations = nameTranslations;
     }
-
-    public int Id { get; private set; }
+    
+    public Guid Id { get; private set; }
     public IEnumerable<Translation> NameTranslations { get; private set; }
-    public Topic Topic { get; private set; }
+    public IEnumerable<SubTopic> SubTopics { get; private set; }
 }

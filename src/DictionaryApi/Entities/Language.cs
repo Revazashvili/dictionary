@@ -1,4 +1,4 @@
-namespace DictionaryApi.Models;
+namespace DictionaryApi.Entities;
 
 /// <summary>
 /// Enum for supported languages

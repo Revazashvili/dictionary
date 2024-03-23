@@ -20,6 +20,6 @@ services:
       dockerfile: src/DictionaryApi/Dockerfile
     depends_on: [dictionary-db]
     ports:
-      - "8080:8080"
+      - "80:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development

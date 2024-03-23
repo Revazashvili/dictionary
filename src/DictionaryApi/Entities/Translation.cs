@@ -1,4 +1,4 @@
-namespace DictionaryApi.Models;
+namespace DictionaryApi.Entities;
 
 /// <summary>
 /// Object for holding translation

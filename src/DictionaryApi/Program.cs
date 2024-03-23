@@ -1,6 +1,10 @@
 using DictionaryApi;
+using DictionaryApi.Endpoints;
+using DictionaryApi.Entities;
+using Marten;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +16,12 @@ var connectionString = builder.Configuration.GetConnectionString("DictionaryDb")
 builder.Services.AddDbContext<DictionaryDbContext>(options => 
     options.UseNpgsql(connectionString));
 
+builder.Services.AddMarten(options =>
+{
+    options.Connection(connectionString);
+    options.DatabaseSchemaName = "dictionary";
+});
+
 builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<DictionaryDbContext>()
     .AddApiEndpoints();
@@ -21,7 +31,9 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.MapIdentityApi<User>();
+var apiGroup = app.MapGroup("/api");
+apiGroup.MapIdentityApi<User>();
+apiGroup.MapTopicApi();
 
 app.UseSwagger();
 app.UseSwaggerUI();

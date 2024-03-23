@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace DictionaryApi;
+namespace DictionaryApi.Entities;
 
 public class User : IdentityUser;
