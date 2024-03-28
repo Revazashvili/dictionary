@@ -1,9 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
-using DictionaryApi.Entities;
-using DictionaryApi.Extensions;
 using DictionaryApi.Models;
-using Marten;
+using DictionaryApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DictionaryApi.Endpoints;
@@ -12,27 +9,29 @@ public static class TopicEndpoints
 {
     public static IEndpointRouteBuilder MapTopicApi(this IEndpointRouteBuilder topicEndpointRouteBuilder)
     {
-        topicEndpointRouteBuilder.MapPost("topic/add", async ([FromBody] AddTopicRequest addTopicRequest,
-                IDocumentSession documentSession,CancellationToken cancellationToken) =>
-            {
-                var georgianTranslation = addTopicRequest[Language.Ka];
-                var englishTranslation = addTopicRequest[Language.Ka];
-                var topicExists = await documentSession.Query<Topic>()
-                    .AnyAsync(topic => topic.NameTranslations.Any(), cancellationToken);
+        topicEndpointRouteBuilder.MapGet("topic",
+            (ITopicService topicService, CancellationToken cancellationToken) =>
+                topicService.GetAllAsync(cancellationToken));
 
-                if (topicExists)
-                    return Results.BadRequest("topic already exists");
+        topicEndpointRouteBuilder.MapGet("topic/{id:int}",
+            (int id, ITopicService topicService, CancellationToken cancellationToken) =>
+                topicService.GetByIdAsync(id, cancellationToken));
 
-                var topic = new Topic(Guid.NewGuid(),addTopicRequest.NameTranslations.ToTranslations());
-                documentSession.Store(topic);
-
-                await documentSession.SaveChangesAsync(cancellationToken);
-
-                return Results.Ok(topic.Id);
-            })
+        topicEndpointRouteBuilder.MapPost("topic", ([FromBody] AddTopicRequest addTopicRequest,
+                    ITopicService topicService, CancellationToken cancellationToken) =>
+                topicService.AddAsync(addTopicRequest, cancellationToken))
             .Accepts<AddTopicRequest>(MediaTypeNames.Application.Json)
-            .Produces<int>()
-            .WithOpenApi();
+            .Produces<int>();
+
+        topicEndpointRouteBuilder.MapPut("topic", ([FromBody] UpdateTopicRequest updateTopicRequest,
+                    ITopicService topicService, CancellationToken cancellationToken) =>
+                Task.FromResult(topicService.UpdateAsync(updateTopicRequest, cancellationToken)))
+            .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json);
+
+        topicEndpointRouteBuilder.MapDelete("topic", ([FromBody] DeleteTopicRequest deleteTopicRequest,
+                    ITopicService topicService, CancellationToken cancellationToken) =>
+                Task.FromResult(topicService.DeleteAsync(deleteTopicRequest, cancellationToken)))
+            .Accepts<DeleteTopicRequest>(MediaTypeNames.Application.Json);
 
         return topicEndpointRouteBuilder;
     }

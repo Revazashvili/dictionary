@@ -1,6 +1,8 @@
 using DictionaryApi;
 using DictionaryApi.Endpoints;
 using DictionaryApi.Entities;
+using DictionaryApi.Persistence;
+using DictionaryApi.Services;
 using Marten;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +30,9 @@ builder.Services.AddIdentityCore<User>()
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<ITranslationService, TranslationService>();
+builder.Services.AddScoped<ITopicService, TopicService>();
 
 var app = builder.Build();
 

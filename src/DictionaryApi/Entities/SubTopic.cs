@@ -2,16 +2,19 @@ namespace DictionaryApi.Entities;
 
 public class SubTopic
 {
-    public SubTopic(int id, IEnumerable<Translation> nameTranslations)
+    // Used by EF Core
+    private SubTopic() {}
+    
+    public SubTopic(int id, Guid translationId)
     {
-        if (!nameTranslations.Any())
-            throw new ArgumentNullException(nameof(nameTranslations));
+        if (translationId == Guid.Empty)
+            throw new ArgumentException($"translationId is guid empty", nameof(translationId));
         
         Id = id;
-        NameTranslations = nameTranslations;
+        TranslationId = translationId;
     }
 
     public int Id { get; private set; }
-    public IEnumerable<Translation> NameTranslations { get; private set; }
+    public Guid TranslationId { get; private set; }
     public Topic Topic { get; private set; }
 }
