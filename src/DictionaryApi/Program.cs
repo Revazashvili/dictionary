@@ -1,13 +1,10 @@
 using System.Text.Json.Serialization;
-using DictionaryApi;
 using DictionaryApi.Endpoints;
 using DictionaryApi.Entities;
 using DictionaryApi.Persistence;
 using DictionaryApi.Services;
-using Marten;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Weasel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,12 +15,6 @@ builder.Services.AddAuthorizationBuilder();
 var connectionString = builder.Configuration.GetConnectionString("DictionaryDb");
 builder.Services.AddDbContext<DictionaryDbContext>(options => 
     options.UseNpgsql(connectionString));
-
-builder.Services.AddMarten(options =>
-{
-    options.Connection(connectionString);
-    options.DatabaseSchemaName = "dictionary";
-});
 
 builder.Services.AddIdentityCore<User>()
     .AddEntityFrameworkStores<DictionaryDbContext>()
