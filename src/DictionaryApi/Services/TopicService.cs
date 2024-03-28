@@ -9,11 +9,15 @@ public class TopicService : ITopicService
 {
     private readonly DictionaryDbContext _context;
     private readonly ITranslationService _translationService;
+    private readonly ISubTopicService _subTopicService;
 
-    public TopicService(DictionaryDbContext context,ITranslationService translationService)
+    public TopicService(DictionaryDbContext context, 
+        ITranslationService translationService,
+        ISubTopicService _subTopicService)
     {
         _context = context;
         _translationService = translationService;
+        this._subTopicService = _subTopicService;
     }
     
     public async Task<IEnumerable<TopicDto>> GetAllAsync(CancellationToken cancellationToken)
@@ -49,12 +53,12 @@ public class TopicService : ITopicService
 
         if (topic is null)
             throw new Exception("Topic not found");
-        
+
         return new TopicDto
         {
             Id = topic.Id,
             NameTranslations = await _translationService.GetByTranslationIdAsync(topic.TranslationId, cancellationToken),
-            SubTopics = new SubTopicDto[] { } //TODO: get from ISubTopicService
+            SubTopics = await _subTopicService.GetByTopicIdAsync(topic.Id, cancellationToken)
         };
     }
 
