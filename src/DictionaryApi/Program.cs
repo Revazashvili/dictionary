@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using DictionaryApi;
 using DictionaryApi.Endpoints;
 using DictionaryApi.Entities;
@@ -33,6 +34,16 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 var app = builder.Build();
 
