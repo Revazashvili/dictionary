@@ -61,12 +61,7 @@ public class TopicService : ITopicService
 
     public async Task<int> AddAsync(AddTopicRequest request,CancellationToken cancellationToken)
     {
-        var translationValues = request.NameTranslations.Select(translation => translation.Value).ToList();
-        var exists = await _context.Topics
-            .AnyAsync(topic => topic.NameTranslations.Any(translation => translationValues.Contains(translation.Value)),
-                cancellationToken);
-
-        if (exists)
+        if (await CheckTopicExistsWithNames(request.NameTranslations, cancellationToken))
             throw new Exception("translation with same names already exists");
             
         var topic = new Topic
@@ -81,15 +76,17 @@ public class TopicService : ITopicService
 
     public async Task UpdateAsync(UpdateTopicRequest request,CancellationToken cancellationToken)
     {
+        if (await CheckTopicExistsWithNames(request.NameTranslations, cancellationToken))
+            throw new Exception("translation with same names already exists");
+        
         var topic = await _context.Topics
             .SingleOrDefaultAsync(topic => topic.Id == request.Id, cancellationToken);
 
         if (topic is null)
             throw new Exception("Topic not found");
 
-        // await _translationService.DeleteByTranslationIdAsync(topic.TranslationId, cancellationToken);
-        // await _translationService.AddAsync(topic.TranslationId, request.NameTranslations, cancellationToken);
-
+        topic.NameTranslations = request.NameTranslations;
+        
         await _context.SaveChangesAsync(cancellationToken);
     }
 
@@ -104,4 +101,21 @@ public class TopicService : ITopicService
         _context.Topics.Remove(topic);
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    #region Private
+
+    private async Task<bool> CheckTopicExistsWithNames(IEnumerable<Translation> nameTranslations, CancellationToken cancellationToken)
+    {
+        var georgianTranslation = nameTranslations.First(translation => translation.Language == Language.Ka).Value;
+        var englishTranslation = nameTranslations.First(translation => translation.Language == Language.En).Value;
+
+        var exists = await _context.Topics
+            .AnyAsync(topic => topic.NameTranslations.Any(translation => translation.Language == Language.Ka && translation.Value == georgianTranslation)
+                               || topic.NameTranslations.Any(translation => translation.Language == Language.En && translation.Value == englishTranslation),
+                cancellationToken);
+        
+        return exists;
+    }
+
+    #endregion
 }
