@@ -8,13 +8,10 @@ namespace DictionaryApi.Services;
 public class TopicService : ITopicService
 {
     private readonly DictionaryDbContext _context;
-    private readonly ISubTopicService _subTopicService;
 
-    public TopicService(DictionaryDbContext context, 
-        ISubTopicService _subTopicService)
+    public TopicService(DictionaryDbContext context)
     {
         _context = context;
-        this._subTopicService = _subTopicService;
     }
     
     public async Task<IEnumerable<Topic>> GetAllAsync(CancellationToken cancellationToken)
