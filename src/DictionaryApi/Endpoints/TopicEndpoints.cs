@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using DictionaryApi.Models;
 using DictionaryApi.Services;
+using DictionaryApi.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DictionaryApi.Endpoints;
@@ -14,23 +16,49 @@ public static class TopicEndpoints
                 topicService.GetAllAsync(cancellationToken));
 
         topicEndpointRouteBuilder.MapGet("topic/{id:int}",
-            (int id, ITopicService topicService, CancellationToken cancellationToken) =>
-                topicService.GetByIdAsync(id, cancellationToken));
+            async ([Required] int id, ITopicService topicService, CancellationToken cancellationToken) => 
+            id == 0 ? Results.BadRequest("id is not valid")
+                : Results.Ok(await topicService.GetByIdAsync(id, cancellationToken)));
 
-        topicEndpointRouteBuilder.MapPost("topic", ([FromBody] AddTopicRequest addTopicRequest,
-                    ITopicService topicService, CancellationToken cancellationToken) =>
-                topicService.AddAsync(addTopicRequest, cancellationToken))
+        topicEndpointRouteBuilder.MapPost("topic", async ([FromBody] [Required] AddTopicRequest addTopicRequest,
+                ITopicService topicService, CancellationToken cancellationToken) =>
+            {
+                var errorMessage = addTopicRequest.NameTranslations.Validate();
+                if (!string.IsNullOrEmpty(errorMessage))
+                    return Results.BadRequest(errorMessage);
+                
+                var topicId = await topicService.AddAsync(addTopicRequest, cancellationToken);
+
+                return Results.Ok(topicId);
+            })
             .Accepts<AddTopicRequest>(MediaTypeNames.Application.Json)
             .Produces<int>();
 
-        topicEndpointRouteBuilder.MapPut("topic", ([FromBody] UpdateTopicRequest updateTopicRequest,
-                    ITopicService topicService, CancellationToken cancellationToken) =>
-                topicService.UpdateAsync(updateTopicRequest, cancellationToken))
+        topicEndpointRouteBuilder.MapPut("topic", async ([FromBody] [Required] UpdateTopicRequest updateTopicRequest,
+                ITopicService topicService, CancellationToken cancellationToken) =>
+            {
+                if (updateTopicRequest.Id == 0)
+                    return Results.BadRequest("id is not valid");
+                
+                var errorMessage = updateTopicRequest.NameTranslations.Validate();
+                if (!string.IsNullOrEmpty(errorMessage))
+                    return Results.BadRequest(errorMessage);
+                
+                await topicService.UpdateAsync(updateTopicRequest, cancellationToken);
+
+                return Results.Ok();
+            })
             .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json);
 
         topicEndpointRouteBuilder.MapDelete("topic/{id:int}",
-                (int id, ITopicService topicService, CancellationToken cancellationToken) =>
-                    topicService.DeleteAsync(id, cancellationToken))
+                async ([Required] int id, ITopicService topicService, CancellationToken cancellationToken) =>
+                {
+                    if (id == 0)
+                        return Results.BadRequest("id is not valid");
+
+                    await topicService.DeleteAsync(id, cancellationToken);
+                    return Results.Ok();
+                })
             .Accepts<int>(MediaTypeNames.Application.Json);
 
         return topicEndpointRouteBuilder;
