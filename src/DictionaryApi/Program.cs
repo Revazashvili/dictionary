@@ -23,17 +23,18 @@ builder.Services.AddIdentityCore<User>()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ISubTopicService, SubTopicService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
 
 var app = builder.Build();
@@ -41,6 +42,7 @@ var app = builder.Build();
 var apiGroup = app.MapGroup("/api");
 apiGroup.MapIdentityApi<User>();
 apiGroup.MapTopicApi();
+apiGroup.MapSubTopicApi();
 
 app.UseSwagger();
 app.UseSwaggerUI();

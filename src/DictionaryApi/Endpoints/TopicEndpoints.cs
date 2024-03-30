@@ -20,7 +20,7 @@ public static class TopicEndpoints
             id == 0 ? Results.BadRequest("id is not valid")
                 : Results.Ok(await topicService.GetByIdAsync(id, cancellationToken)));
 
-        topicEndpointRouteBuilder.MapPost("topic", async ([FromBody] [Required] AddTopicRequest addTopicRequest,
+        topicEndpointRouteBuilder.MapPost("topic", async ([FromBody] AddTopicRequest addTopicRequest,
                 ITopicService topicService, CancellationToken cancellationToken) =>
             {
                 var errorMessage = addTopicRequest.NameTranslations.Validate();
@@ -34,7 +34,7 @@ public static class TopicEndpoints
             .Accepts<AddTopicRequest>(MediaTypeNames.Application.Json)
             .Produces<int>();
 
-        topicEndpointRouteBuilder.MapPut("topic", async ([FromBody] [Required] UpdateTopicRequest updateTopicRequest,
+        topicEndpointRouteBuilder.MapPut("topic", async ([FromBody] UpdateTopicRequest updateTopicRequest,
                 ITopicService topicService, CancellationToken cancellationToken) =>
             {
                 if (updateTopicRequest.Id == 0)
@@ -51,7 +51,7 @@ public static class TopicEndpoints
             .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json);
 
         topicEndpointRouteBuilder.MapDelete("topic/{id:int}",
-                async ([Required] int id, ITopicService topicService, CancellationToken cancellationToken) =>
+                async (int id, ITopicService topicService, CancellationToken cancellationToken) =>
                 {
                     if (id == 0)
                         return Results.BadRequest("id is not valid");

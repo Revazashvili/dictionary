@@ -6,7 +6,7 @@ internal static class TranslationsValidator
 {
     internal static string Validate(this IEnumerable<Translation> translations)
     {
-        if (translations.Count() == 2)
+        if (translations.Count() != 2)
             return "translations must contain both language";
 
         var georgian = translations.FirstOrDefault(translation => translation.Language == Language.Ka);
