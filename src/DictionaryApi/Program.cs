@@ -24,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<ITopicService, TopicService>();
+builder.Services.AddScoped<IEntryService, EntryService>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {

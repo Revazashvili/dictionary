@@ -105,6 +105,18 @@ public class TopicService : ITopicService
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+    
+    public async Task<SubTopic> GetSubTopicAsync(int subTopicId, CancellationToken cancellationToken)
+    {
+        var subTopic = await _context.SubTopics
+            .SingleOrDefaultAsync(subTopic => subTopic.Id == subTopicId, cancellationToken);
+
+        if (subTopic is null)
+            throw new Exception("SubTopic not found");
+        
+        return subTopic;
+    }
+
 
     #region Private
 
@@ -132,17 +144,6 @@ public class TopicService : ITopicService
                 cancellationToken);
         
         return exists;
-    }
-
-    private async Task<SubTopic> GetSubTopicAsync(int subTopicId, CancellationToken cancellationToken)
-    {
-        var subTopic = await _context.SubTopics
-            .SingleOrDefaultAsync(subTopic => subTopic.Id == subTopicId, cancellationToken);
-
-        if (subTopic is null)
-            throw new Exception("SubTopic not found");
-        
-        return subTopic;
     }
     
     #endregion
