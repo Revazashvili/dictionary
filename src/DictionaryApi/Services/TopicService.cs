@@ -17,46 +17,25 @@ public class TopicService : ITopicService
         this._subTopicService = _subTopicService;
     }
     
-    public async Task<IEnumerable<TopicDto>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<Topic>> GetAllAsync(CancellationToken cancellationToken)
     {
-        // var topics = await _context.Topics
-        //     .Join(_context.Translations,
-        //         topic => topic.TranslationId,
-        //         translation => translation.TranslationId,
-        //         (topic, translation) => new
-        //         {
-        //             TopicId = topic.Id,
-        //             Translation = translation,
-        //         })
-        //     .GroupBy(result => result.TopicId)
-        //     .Select(grouped => new TopicDto
-        //     {
-        //         Id = grouped.Key,
-        //         NameTranslations = grouped.Select(a => new TranslationModel
-        //         {
-        //             Language = a.Translation.Language,
-        //             Value = a.Translation.Value
-        //         })
-        //     })
-        //     .ToListAsync(cancellationToken);
-
-        return new List<TopicDto>();
+        var topics = await _context.Topics
+            .Include(topic => topic.SubTopics)
+            .ToListAsync(cancellationToken);
+        
+        return topics;
     }
 
-    public async Task<TopicDto> GetByIdAsync(int id,CancellationToken cancellationToken)
+    public async Task<Topic> GetByIdAsync(int id,CancellationToken cancellationToken)
     {
         var topic = await _context.Topics
+            .Include(topic => topic.SubTopics)
             .SingleOrDefaultAsync(topic => topic.Id == id, cancellationToken);
 
         if (topic is null)
             throw new Exception("Topic not found");
 
-        return new TopicDto
-        {
-            Id = topic.Id,
-            // NameTranslations = await _translationService.GetByTranslationIdAsync(topic.TranslationId, cancellationToken),
-            SubTopics = await _subTopicService.GetByTopicIdAsync(topic.Id, cancellationToken)
-        };
+        return topic;
     }
 
     public async Task<int> AddAsync(AddTopicRequest request,CancellationToken cancellationToken)
