@@ -12,7 +12,11 @@ public class SubTopicConfiguration : IEntityTypeConfiguration<SubTopic>
             
         builder.HasKey(subTopic => subTopic.Id);
         
-        builder.Property(subTopic => subTopic.TranslationId).IsRequired();
+        //builder.Property(subTopic => subTopic.TranslationId).IsRequired();
+        
+        builder.OwnsMany(topic => topic.NameTranslations, 
+            ownedNavigationBuilder => ownedNavigationBuilder.ToJson());
+
         
         builder.HasOne(subTopic => subTopic.Topic)
             .WithMany(topic => topic.SubTopics);

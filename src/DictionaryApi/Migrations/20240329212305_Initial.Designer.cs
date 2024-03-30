@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DictionaryApi.Migrations
 {
     [DbContext(typeof(DictionaryDbContext))]
-    [Migration("20240328181046_Initial")]
+    [Migration("20240329212305_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -37,9 +37,6 @@ namespace DictionaryApi.Migrations
                     b.Property<int>("TopicId")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("TranslationId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("TopicId");
@@ -55,39 +52,9 @@ namespace DictionaryApi.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("TranslationId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.ToTable("Topic", "Dictionary");
-                });
-
-            modelBuilder.Entity("DictionaryApi.Entities.Translation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .IsUnicode(true)
-                        .HasColumnType("character(100)")
-                        .IsFixedLength();
-
-                    b.Property<Guid>("TranslationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Translation", "Dictionary");
                 });
 
             modelBuilder.Entity("DictionaryApi.Entities.User", b =>
@@ -294,7 +261,66 @@ namespace DictionaryApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsMany("DictionaryApi.Entities.Translation", "NameTranslations", b1 =>
+                        {
+                            b1.Property<int>("SubTopicId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Language")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("SubTopicId", "Id");
+
+                            b1.ToTable("SubTopic", "Dictionary");
+
+                            b1.ToJson("NameTranslations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SubTopicId");
+                        });
+
+                    b.Navigation("NameTranslations");
+
                     b.Navigation("Topic");
+                });
+
+            modelBuilder.Entity("DictionaryApi.Entities.Topic", b =>
+                {
+                    b.OwnsMany("DictionaryApi.Entities.Translation", "NameTranslations", b1 =>
+                        {
+                            b1.Property<int>("TopicId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("Language")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Value")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("TopicId", "Id");
+
+                            b1.ToTable("Topic", "Dictionary");
+
+                            b1.ToJson("NameTranslations");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TopicId");
+                        });
+
+                    b.Navigation("NameTranslations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

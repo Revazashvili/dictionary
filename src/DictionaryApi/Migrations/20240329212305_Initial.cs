@@ -66,27 +66,11 @@ namespace DictionaryApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TranslationId = table.Column<Guid>(type: "uuid", nullable: false)
+                    NameTranslations = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Topic", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Translation",
-                schema: "Dictionary",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TranslationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Language = table.Column<string>(type: "character(100)", fixedLength: true, maxLength: 100, nullable: false),
-                    Value = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Translation", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -213,8 +197,8 @@ namespace DictionaryApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TranslationId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TopicId = table.Column<int>(type: "integer", nullable: false)
+                    TopicId = table.Column<int>(type: "integer", nullable: false),
+                    NameTranslations = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -304,10 +288,6 @@ namespace DictionaryApi.Migrations
 
             migrationBuilder.DropTable(
                 name: "SubTopic",
-                schema: "Dictionary");
-
-            migrationBuilder.DropTable(
-                name: "Translation",
                 schema: "Dictionary");
 
             migrationBuilder.DropTable(
