@@ -30,7 +30,7 @@ public static class TopicEndpoints
 
         topicEndpointRouteBuilder.MapDelete("topic/{id:int}",
                 (int id, ITopicService topicService, CancellationToken cancellationToken) =>
-                    Task.FromResult(topicService.DeleteAsync(id, cancellationToken)))
+                    topicService.DeleteAsync(id, cancellationToken))
             .Accepts<int>(MediaTypeNames.Application.Json);
 
         return topicEndpointRouteBuilder;
