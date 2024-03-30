@@ -4,7 +4,7 @@ using DictionaryApi.Models;
 
 namespace DictionaryApi.Attributes;
 
-[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Property)]
 public class RequiredBothLanguageAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
