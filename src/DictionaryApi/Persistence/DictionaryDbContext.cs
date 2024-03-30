@@ -14,6 +14,7 @@ public class DictionaryDbContext : IdentityDbContext<User>
 
     public DbSet<Topic> Topics => base.Set<Topic>();
     public DbSet<SubTopic> SubTopics => base.Set<SubTopic>();
+    public DbSet<Entry> Entries => base.Set<Entry>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
