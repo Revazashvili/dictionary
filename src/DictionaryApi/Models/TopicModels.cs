@@ -15,7 +15,7 @@ public class AddTopicRequest
 {
     [Required]
     [RequiredBothLanguage]
-    public IEnumerable<Translation> NameTranslations { get; set; }
+    public List<Translation> NameTranslations { get; set; }
 }
 
 public class UpdateTopicRequest
@@ -25,7 +25,7 @@ public class UpdateTopicRequest
     
     [Required]
     [RequiredBothLanguage]
-    public IEnumerable<Translation> NameTranslations { get; set; }
+    public List<Translation> NameTranslations { get; set; }
 }
 
 public class DeleteTopicRequest

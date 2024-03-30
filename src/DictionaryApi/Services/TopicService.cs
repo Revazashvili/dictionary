@@ -61,12 +61,17 @@ public class TopicService : ITopicService
 
     public async Task<int> AddAsync(AddTopicRequest request,CancellationToken cancellationToken)
     {
-        // if (await _translationService.ExistsWithNamesAsync(request.NameTranslations, cancellationToken))
-        //     throw new Exception("translation with names already exists");
-        
+        var translationValues = request.NameTranslations.Select(translation => translation.Value).ToList();
+        var exists = await _context.Topics
+            .AnyAsync(topic => topic.NameTranslations.Any(translation => translationValues.Contains(translation.Value)),
+                cancellationToken);
+
+        if (exists)
+            throw new Exception("translation with same names already exists");
+            
         var topic = new Topic
         {
-            NameTranslations = request.NameTranslations.ToList()
+            NameTranslations = request.NameTranslations
         };
         var entry = await _context.Topics.AddAsync(topic, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
