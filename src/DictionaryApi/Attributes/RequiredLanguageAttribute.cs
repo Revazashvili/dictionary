@@ -9,7 +9,7 @@ public class RequiredBothLanguageAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        var translationModels = (value as IEnumerable<TranslationModel>)!.ToList();
+        var translationModels = (value as IEnumerable<Translation>)!.ToList();
         
         if(translationModels.Count == 0)
             return new ValidationResult($"{validationContext.DisplayName} is empty");

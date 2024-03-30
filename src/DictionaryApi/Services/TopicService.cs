@@ -1,5 +1,4 @@
 using DictionaryApi.Entities;
-using DictionaryApi.Extensions;
 using DictionaryApi.Models;
 using DictionaryApi.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -9,15 +8,12 @@ namespace DictionaryApi.Services;
 public class TopicService : ITopicService
 {
     private readonly DictionaryDbContext _context;
-    private readonly ITranslationService _translationService;
     private readonly ISubTopicService _subTopicService;
 
     public TopicService(DictionaryDbContext context, 
-        ITranslationService translationService,
         ISubTopicService _subTopicService)
     {
         _context = context;
-        _translationService = translationService;
         this._subTopicService = _subTopicService;
     }
     
@@ -68,9 +64,11 @@ public class TopicService : ITopicService
         // if (await _translationService.ExistsWithNamesAsync(request.NameTranslations, cancellationToken))
         //     throw new Exception("translation with names already exists");
         
-        var topic = new Topic(request.NameTranslations.ToTranslations());
+        var topic = new Topic
+        {
+            NameTranslations = request.NameTranslations.ToList()
+        };
         var entry = await _context.Topics.AddAsync(topic, cancellationToken);
-
         await _context.SaveChangesAsync(cancellationToken);
 
         return entry.Entity.Id;

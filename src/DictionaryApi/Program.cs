@@ -23,7 +23,6 @@ builder.Services.AddIdentityCore<User>()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<ISubTopicService, SubTopicService>();
 builder.Services.AddScoped<ITopicService, TopicService>();
 
