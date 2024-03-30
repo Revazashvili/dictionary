@@ -25,13 +25,13 @@ public static class TopicEndpoints
 
         topicEndpointRouteBuilder.MapPut("topic", ([FromBody] UpdateTopicRequest updateTopicRequest,
                     ITopicService topicService, CancellationToken cancellationToken) =>
-                Task.FromResult(topicService.UpdateAsync(updateTopicRequest, cancellationToken)))
+                topicService.UpdateAsync(updateTopicRequest, cancellationToken))
             .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json);
 
-        topicEndpointRouteBuilder.MapDelete("topic", ([FromBody] DeleteTopicRequest deleteTopicRequest,
-                    ITopicService topicService, CancellationToken cancellationToken) =>
-                Task.FromResult(topicService.DeleteAsync(deleteTopicRequest, cancellationToken)))
-            .Accepts<DeleteTopicRequest>(MediaTypeNames.Application.Json);
+        topicEndpointRouteBuilder.MapDelete("topic/{id:int}",
+                (int id, ITopicService topicService, CancellationToken cancellationToken) =>
+                    Task.FromResult(topicService.DeleteAsync(id, cancellationToken)))
+            .Accepts<int>(MediaTypeNames.Application.Json);
 
         return topicEndpointRouteBuilder;
     }

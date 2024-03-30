@@ -8,5 +8,5 @@ public interface ITopicService
     Task<TopicDto> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task<int> AddAsync(AddTopicRequest request, CancellationToken cancellationToken);
     Task UpdateAsync(UpdateTopicRequest request, CancellationToken cancellationToken);
-    Task DeleteAsync(DeleteTopicRequest request, CancellationToken cancellationToken);
+    Task DeleteAsync(int id, CancellationToken cancellationToken);
 }

@@ -88,10 +88,10 @@ public class TopicService : ITopicService
         await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task DeleteAsync(DeleteTopicRequest request,CancellationToken cancellationToken)
+    public async Task DeleteAsync(int id,CancellationToken cancellationToken)
     {
         var topic = await _context.Topics
-            .SingleOrDefaultAsync(topic => topic.Id == request.Id, cancellationToken);
+            .SingleOrDefaultAsync(topic => topic.Id == id, cancellationToken);
 
         if (topic is null)
             throw new Exception("Topic not found");
