@@ -12,8 +12,15 @@ public class TopicConfiguration : IEntityTypeConfiguration<Topic>
         
         builder.HasKey(topic => topic.Id);
 
-        builder.OwnsMany(topic => topic.NameTranslations, 
-            ownedNavigationBuilder => ownedNavigationBuilder.ToJson());
+        builder.Property(topic => topic.GeorgianName)
+            .IsUnicode()
+            .IsRequired()
+            .HasMaxLength(200);
+        
+        builder.Property(topic => topic.EnglishName)
+            .IsUnicode()
+            .IsRequired()
+            .HasMaxLength(200);
         
         builder.HasMany(topic => topic.SubTopics)
             .WithOne(subTopic => subTopic.Topic)

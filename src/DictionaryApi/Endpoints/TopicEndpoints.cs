@@ -9,7 +9,7 @@ namespace DictionaryApi.Endpoints;
 
 public static class TopicEndpoints
 {
-    public static IEndpointRouteBuilder MapTopicApi(this IEndpointRouteBuilder topicEndpointRouteBuilder)
+    public static void MapTopicApi(this IEndpointRouteBuilder topicEndpointRouteBuilder)
     {
         topicEndpointRouteBuilder.MapGet("topic",
             (ITopicService topicService, CancellationToken cancellationToken) =>
@@ -23,7 +23,7 @@ public static class TopicEndpoints
         topicEndpointRouteBuilder.MapPost("topic", async ([FromBody] AddTopicRequest addTopicRequest,
                 ITopicService topicService, CancellationToken cancellationToken) =>
             {
-                var errorMessage = addTopicRequest.NameTranslations.Validate();
+                var errorMessage = addTopicRequest.Validate();
                 if (!string.IsNullOrEmpty(errorMessage))
                     return Results.BadRequest(errorMessage);
                 
@@ -40,7 +40,7 @@ public static class TopicEndpoints
                 if (updateTopicRequest.Id == 0)
                     return Results.BadRequest("id is not valid");
                 
-                var errorMessage = updateTopicRequest.NameTranslations.Validate();
+                var errorMessage = updateTopicRequest.Validate();
                 if (!string.IsNullOrEmpty(errorMessage))
                     return Results.BadRequest(errorMessage);
                 
@@ -60,7 +60,5 @@ public static class TopicEndpoints
                     return Results.Ok();
                 })
             .Accepts<int>(MediaTypeNames.Application.Json);
-
-        return topicEndpointRouteBuilder;
     }
 }

@@ -12,8 +12,15 @@ public class SubTopicConfiguration : IEntityTypeConfiguration<SubTopic>
             
         builder.HasKey(subTopic => subTopic.Id);
         
-        builder.OwnsMany(topic => topic.NameTranslations, 
-            ownedNavigationBuilder => ownedNavigationBuilder.ToJson());
+        builder.Property(subTopic => subTopic.GeorgianName)
+            .IsUnicode()
+            .IsRequired()
+            .HasMaxLength(200);
+        
+        builder.Property(subTopic => subTopic.EnglishName)
+            .IsUnicode()
+            .IsRequired()
+            .HasMaxLength(200);
         
         builder.HasOne(subTopic => subTopic.Topic)
             .WithMany(topic => topic.SubTopics);

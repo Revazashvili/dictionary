@@ -1,14 +1,8 @@
-using DictionaryApi.Entities;
-
 namespace DictionaryApi.Models;
 
-public class AddTopicRequest
-{
-    public List<Translation> NameTranslations { get; set; }
-}
+public class AddTopicRequest : Translatable;
 
-public class UpdateTopicRequest
+public class UpdateTopicRequest : Translatable
 {
     public int Id { get; set; }
-    public List<Translation> NameTranslations { get; set; }
 }
