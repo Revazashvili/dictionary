@@ -6,6 +6,7 @@ namespace DictionaryApi.Services;
 internal interface IEntryService
 {
     Task<IEnumerable<Entry>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken);
+    Task<int> GetCountAsync(Pagination pagination, CancellationToken cancellationToken);
     Task<IEnumerable<Entry>> GetAllForSubTopicAsync(int subTopicId, Pagination pagination, CancellationToken cancellationToken);
     Task<IEnumerable<Entry>> SearchAsync(string searchText, CancellationToken cancellationToken);
     Task<Entry> GetByIdAsync(int id, CancellationToken cancellationToken);
