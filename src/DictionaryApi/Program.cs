@@ -40,6 +40,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
+
 var apiGroup = app.MapGroup("/api");
 apiGroup.MapIdentityApi<User>();
 apiGroup.MapTopicApi();

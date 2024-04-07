@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using DictionaryApi.Models;
 using DictionaryApi.Services;
-using DictionaryApi.Validators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DictionaryApi.Endpoints;
@@ -23,10 +22,7 @@ public static class TopicEndpoints
         topicEndpointRouteBuilder.MapPost("topic", async ([FromBody] AddTopicRequest addTopicRequest,
                 ITopicService topicService, CancellationToken cancellationToken) =>
             {
-                var errorMessage = addTopicRequest.Validate();
-                if (!string.IsNullOrEmpty(errorMessage))
-                    return Results.BadRequest(errorMessage);
-                
+                addTopicRequest.Validate();
                 var topicId = await topicService.AddAsync(addTopicRequest, cancellationToken);
 
                 return Results.Ok(topicId);
@@ -37,13 +33,7 @@ public static class TopicEndpoints
         topicEndpointRouteBuilder.MapPut("topic", async ([FromBody] UpdateTopicRequest updateTopicRequest,
                 ITopicService topicService, CancellationToken cancellationToken) =>
             {
-                if (updateTopicRequest.Id == 0)
-                    return Results.BadRequest("id is not valid");
-                
-                var errorMessage = updateTopicRequest.Validate();
-                if (!string.IsNullOrEmpty(errorMessage))
-                    return Results.BadRequest(errorMessage);
-                
+                updateTopicRequest.Validate();
                 await topicService.UpdateAsync(updateTopicRequest, cancellationToken);
 
                 return Results.Ok();
