@@ -39,7 +39,7 @@ internal class EntryService : IEntryService
     public async Task<IEnumerable<Entry>> SearchAsync(string searchText, CancellationToken cancellationToken)
     {
         var entries = await _context.Entries
-            .Where(entry => entry.HeadwordTranslations.Select(headwordTranslation => headwordTranslation.Value).Contains(searchText))
+            .Where(entry => entry.GeorgianHeadword.Contains(searchText) || entry.EnglishHeadword.Contains(searchText))
             .ToListAsync(cancellationToken);
 
         return entries;
@@ -62,11 +62,14 @@ internal class EntryService : IEntryService
 
         var entry = new Entry
         {
-            HeadwordTranslations = request.HeadwordTranslations,
-            DefinitionTranslations = request.DefinitionTranslations,
+            GeorgianHeadword = request.GeorgianHeadword,
+            EnglishHeadword = request.EnglishHeadword,
+            GeorgianDefinition = request.GeorgianDefinition,
+            EnglishDefinition = request.EnglishDefinition,
             FunctionalLabel = request.FunctionalLabel,
             Idiom = request.Idiom,
-            IllustrationSentenceTranslations = request.IllustrationSentenceTranslations,
+            GeorgianIllustrationSentence = request.GeorgianIllustrationSentence,
+            EnglishIllustrationSentence = request.EnglishIllustrationSentence,
             ImageUrl = request.ImageUrl,
             Source = request.Source,
             StylisticQualification = request.StylisticQualification,
@@ -86,11 +89,14 @@ internal class EntryService : IEntryService
         var entry = await GetByIdAsync(request.Id, cancellationToken);
         var subTopic = await _topicService.GetSubTopicAsync(request.SubTopicId, cancellationToken);
 
-        entry.HeadwordTranslations = request.HeadwordTranslations;
-        entry.DefinitionTranslations = request.DefinitionTranslations;
+        entry.GeorgianHeadword = request.GeorgianHeadword;
+        entry.EnglishHeadword = request.EnglishHeadword;
+        entry.GeorgianDefinition = request.GeorgianDefinition;
+        entry.EnglishDefinition = request.EnglishDefinition;
         entry.FunctionalLabel = request.FunctionalLabel;
         entry.Idiom = request.Idiom;
-        entry.IllustrationSentenceTranslations = request.IllustrationSentenceTranslations;
+        entry.GeorgianIllustrationSentence = request.GeorgianIllustrationSentence;
+        entry.EnglishIllustrationSentence = request.EnglishIllustrationSentence;
         entry.ImageUrl = request.ImageUrl;
         entry.Source = request.Source;
         entry.StylisticQualification = request.StylisticQualification;

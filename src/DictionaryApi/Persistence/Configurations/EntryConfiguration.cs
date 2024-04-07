@@ -12,8 +12,13 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
         
         builder.HasKey(entry => entry.Id);
 
-        builder.OwnsMany(entry => entry.HeadwordTranslations, 
-            ownedNavigationBuilder => ownedNavigationBuilder.ToJson());
+        builder.Property(entry => entry.EnglishHeadword)
+            .IsUnicode()
+            .IsRequired();
+        
+        builder.Property(entry => entry.GeorgianHeadword)
+            .IsUnicode()
+            .IsRequired();
 
         builder.Property(entry => entry.FunctionalLabel)
             .IsUnicode()
@@ -25,11 +30,21 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
             .IsRequired()
             .HasMaxLength(50);
         
-        builder.OwnsMany(entry => entry.DefinitionTranslations, 
-            ownedNavigationBuilder => ownedNavigationBuilder.ToJson());
+        builder.Property(entry => entry.GeorgianDefinition)
+            .IsUnicode()
+            .IsRequired();
         
-        builder.OwnsMany(entry => entry.IllustrationSentenceTranslations, 
-            ownedNavigationBuilder => ownedNavigationBuilder.ToJson());
+        builder.Property(entry => entry.EnglishDefinition)
+            .IsUnicode()
+            .IsRequired();
+        
+        builder.Property(entry => entry.GeorgianIllustrationSentence)
+            .IsUnicode()
+            .IsRequired();
+        
+        builder.Property(entry => entry.EnglishIllustrationSentence)
+            .IsUnicode()
+            .IsRequired();
         
         builder.Property(entry => entry.Source)
             .IsUnicode()
@@ -44,8 +59,7 @@ public class EntryConfiguration : IEntityTypeConfiguration<Entry>
             .HasMaxLength(200);
 
         builder.Property(entry => entry.UsageNote)
-            .IsUnicode()
-            .HasMaxLength(500);
+            .IsUnicode();
 
         builder.Property(entry => entry.ImageUrl)
             .IsUnicode()

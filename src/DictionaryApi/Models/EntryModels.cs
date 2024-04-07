@@ -5,9 +5,14 @@ namespace DictionaryApi.Models;
 public class BaseEntryRequest
 {
     /// <summary>
-    /// მეთაური სიტყვა ორივე ენაზე
+    /// მეთაური სიტყვა ქართულად
     /// </summary>
-    public IEnumerable<Translation> HeadwordTranslations { get; set; }
+    public string GeorgianHeadword { get; set; }
+    
+    /// <summary>
+    /// მეთაური სიტყვა ინგლისურად
+    /// </summary>
+    public string EnglishHeadword { get; set; }
     
     /// <summary>
     /// მეტყველების ნაწილი
@@ -20,14 +25,24 @@ public class BaseEntryRequest
     public string StylisticQualification { get; set; }
     
     /// <summary>
-    /// მეთაური სიტყვის განმარტება ორივე ენაზე
+    /// მეთაური სიტყვის განმარტება ქართულად
     /// </summary>
-    public IEnumerable<Translation> DefinitionTranslations { get; set; }
+    public string GeorgianDefinition { get; set; }
     
     /// <summary>
-    /// საილუსტრაციო წინადადება ორივე ენაზე
+    /// მეთაური სიტყვის განმარტება ინგლისურად
     /// </summary>
-    public IEnumerable<Translation> IllustrationSentenceTranslations { get; set; }
+    public string EnglishDefinition { get; set; }
+    
+    /// <summary>
+    /// საილუსტრაციო წინადადება ქართულად
+    /// </summary>
+    public string GeorgianIllustrationSentence { get; set; }
+    
+    /// <summary>
+    /// საილუსტრაციო წინადადება ინგლისურად
+    /// </summary>
+    public string EnglishIllustrationSentence { get; set; }
     
     /// <summary>
     /// კონტექსტის წყარო
