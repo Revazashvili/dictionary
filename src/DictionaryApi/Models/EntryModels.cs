@@ -1,5 +1,3 @@
-using DictionaryApi.Entities;
-
 namespace DictionaryApi.Models;
 
 public class BaseEntryRequest
@@ -73,6 +71,34 @@ public class BaseEntryRequest
     /// ქვეკატეგორიის იდენტიფიკატორი
     /// </summary>
     public int SubTopicId { get; set; }
+
+    public virtual void Validate()
+    {
+        if (string.IsNullOrEmpty(GeorgianHeadword))
+            throw new ArgumentNullException(nameof(GeorgianHeadword), "georgian headword is not valid");
+        
+        if (string.IsNullOrEmpty(EnglishHeadword))
+            throw new ArgumentNullException(nameof(EnglishHeadword), "english headword is not valid");
+
+        if (string.IsNullOrEmpty(FunctionalLabel))
+            throw new ArgumentNullException(nameof(FunctionalLabel), "functional label is not valid");
+
+        if (string.IsNullOrEmpty(StylisticQualification))
+            throw new ArgumentNullException(nameof(StylisticQualification), "stylistic qualification is not valid");
+
+        if (string.IsNullOrEmpty(GeorgianDefinition))
+            throw new ArgumentNullException(nameof(GeorgianDefinition), "georgian definition is not valid");
+
+        if (string.IsNullOrEmpty(EnglishDefinition))
+            throw new ArgumentNullException(nameof(EnglishDefinition), "english definition is not valid");
+        
+        if (string.IsNullOrEmpty(GeorgianIllustrationSentence))
+            throw new ArgumentNullException(nameof(GeorgianIllustrationSentence), "georgian illustration sentence is not valid");
+
+        if (string.IsNullOrEmpty(GeorgianIllustrationSentence))
+            throw new ArgumentNullException(nameof(GeorgianIllustrationSentence), "english illustration sentence is not valid");
+
+    }
 }
 
 public class AddEntryRequest : BaseEntryRequest;
@@ -83,4 +109,12 @@ public class UpdateEntryRequest : BaseEntryRequest
     /// იდენტიფიკატორი
     /// </summary>
     public int Id { get; set; }
+
+    public override void Validate()
+    {
+        if (Id == 0)
+            throw new ArgumentNullException(nameof(Id), "id is not valid");
+        
+        base.Validate();
+    }
 }
