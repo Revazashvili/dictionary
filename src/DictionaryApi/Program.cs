@@ -40,10 +40,8 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
-
 var apiGroup = app.MapGroup("/api");
-apiGroup.MapIdentityApi<User>();
+apiGroup.MapCustomIdentityApi<User>();
 apiGroup.MapTopicApi();
 apiGroup.MapSubTopicApi();
 
@@ -51,5 +49,9 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+var dictionaryDbContext = app.Services.CreateScope()
+    .ServiceProvider.GetRequiredService<DictionaryDbContext>();
+dictionaryDbContext.Database.Migrate();
 
 app.Run();
