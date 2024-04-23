@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
+using DictionaryApi.EndpointFilters;
 using DictionaryApi.Models;
 using DictionaryApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,8 @@ public static class TopicEndpoints
                 return Results.Ok(topicId);
             })
             .Accepts<AddTopicRequest>(MediaTypeNames.Application.Json)
-            .Produces<int>();
+            .Produces<int>()
+            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
 
         topicEndpointRouteBuilder.MapPut("topic", async ([FromBody] UpdateTopicRequest updateTopicRequest,
                 ITopicService topicService, CancellationToken cancellationToken) =>
@@ -38,7 +40,8 @@ public static class TopicEndpoints
 
                 return Results.Ok();
             })
-            .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json);
+            .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json)
+            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
 
         topicEndpointRouteBuilder.MapDelete("topic/{id:int}",
                 async (int id, ITopicService topicService, CancellationToken cancellationToken) =>
@@ -49,6 +52,7 @@ public static class TopicEndpoints
                     await topicService.DeleteAsync(id, cancellationToken);
                     return Results.Ok();
                 })
-            .Accepts<int>(MediaTypeNames.Application.Json);
+            .Accepts<int>(MediaTypeNames.Application.Json)
+            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
     }
 }

@@ -41,7 +41,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Mvc.JsonOptions>(options =>
 var app = builder.Build();
 
 var apiGroup = app.MapGroup("/api");
-apiGroup.MapCustomIdentityApi<User>();
+apiGroup.MapCustomIdentityApi();
 apiGroup.MapTopicApi();
 apiGroup.MapSubTopicApi();
 

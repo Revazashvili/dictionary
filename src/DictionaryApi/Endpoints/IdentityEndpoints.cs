@@ -2,12 +2,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
+using DictionaryApi.Entities;
+using DictionaryApi.Models;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace DictionaryApi.Endpoints;
@@ -16,57 +19,71 @@ public static class IdentityApiEndpoints
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
 
-    public static IEndpointConventionBuilder MapCustomIdentityApi<TUser>(this IEndpointRouteBuilder endpoints)
-        where TUser : class, new()
+    public static IEndpointConventionBuilder MapCustomIdentityApi(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
         var timeProvider = endpoints.ServiceProvider.GetRequiredService<TimeProvider>();
         var bearerTokenOptions = endpoints.ServiceProvider.GetRequiredService<IOptionsMonitor<BearerTokenOptions>>();
-        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<TUser>>();
+        var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<User>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
 
         string? confirmEmailEndpointName = null;
 
         var routeGroup = endpoints.MapGroup("identity");
 
-        routeGroup.MapPost("/register", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] RegisterRequest registration, HttpContext context, [FromServices] IServiceProvider sp) =>
+        routeGroup.MapGet("/", async ([FromServices] IServiceProvider sp,
+            CancellationToken cancellationToken) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
+
+            var users = await userManager.Users
+                .Select(user => new UserResponse(user.Id, user.Email, user.Status))
+                .ToListAsync(cancellationToken);
+
+            return TypedResults.Ok(users);
+        });
+
+        routeGroup.MapPost("/add-user", async Task<Results<Ok, ValidationProblem>>
+            ([FromBody] AddUserRequest addUserRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<User>>();
 
             if (!userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException($"{nameof(MapCustomIdentityApi)} requires a user store with email support.");
             }
 
-            var userStore = sp.GetRequiredService<IUserStore<TUser>>();
-            var emailStore = (IUserEmailStore<TUser>)userStore;
-            var email = registration.Email;
+            var userStore = sp.GetRequiredService<IUserStore<User>>();
+            var emailStore = (IUserEmailStore<User>)userStore;
+            var email = addUserRequest.Email;
 
             if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
             {
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
             }
 
-            var user = new TUser();
+            var user = new User
+            {
+                Role = addUserRequest.Role
+            };
             await userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
-            var result = await userManager.CreateAsync(user, registration.Password);
+            var result = await userManager.CreateAsync(user, addUserRequest.Password);
 
             if (!result.Succeeded)
             {
                 return CreateValidationProblem(result);
             }
 
-            await SendConfirmationEmailAsync(user, userManager, context, email);
+            //await SendConfirmationEmailAsync(user, userManager, context, email);
             return TypedResults.Ok();
         });
 
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
             ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
         {
-            var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+            var signInManager = sp.GetRequiredService<SignInManager<User>>();
 
             var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
             var isPersistent = (useCookies == true) && (useSessionCookies != true);
@@ -98,14 +115,14 @@ public static class IdentityApiEndpoints
         routeGroup.MapPost("/refresh", async Task<Results<Ok<AccessTokenResponse>, UnauthorizedHttpResult, SignInHttpResult, ChallengeHttpResult>>
             ([FromBody] RefreshRequest refreshRequest, [FromServices] IServiceProvider sp) =>
         {
-            var signInManager = sp.GetRequiredService<SignInManager<TUser>>();
+            var signInManager = sp.GetRequiredService<SignInManager<User>>();
             var refreshTokenProtector = bearerTokenOptions.Get(IdentityConstants.BearerScheme).RefreshTokenProtector;
             var refreshTicket = refreshTokenProtector.Unprotect(refreshRequest.RefreshToken);
 
             // Reject the /refresh attempt with a 401 if the token expired or the security stamp validation fails
             if (refreshTicket?.Properties?.ExpiresUtc is not { } expiresUtc ||
                 timeProvider.GetUtcNow() >= expiresUtc ||
-                await signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not TUser user)
+                await signInManager.ValidateSecurityStampAsync(refreshTicket.Principal) is not User user)
 
             {
                 return TypedResults.Challenge();
@@ -118,7 +135,7 @@ public static class IdentityApiEndpoints
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
             ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
             if (await userManager.FindByIdAsync(userId) is not { } user)
             {
                 // We could respond with a 404 instead of a 401 like Identity UI, but that feels like unnecessary information.
@@ -169,7 +186,7 @@ public static class IdentityApiEndpoints
         routeGroup.MapPost("/resendConfirmationEmail", async Task<Ok>
             ([FromBody] ResendConfirmationEmailRequest resendRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
             if (await userManager.FindByEmailAsync(resendRequest.Email) is not { } user)
             {
                 return TypedResults.Ok();
@@ -182,7 +199,7 @@ public static class IdentityApiEndpoints
         routeGroup.MapPost("/forgotPassword", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] ForgotPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
             if (user is not null && await userManager.IsEmailConfirmedAsync(user))
@@ -201,7 +218,7 @@ public static class IdentityApiEndpoints
         routeGroup.MapPost("/resetPassword", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] ResetPasswordRequest resetRequest, [FromServices] IServiceProvider sp) =>
         {
-            var userManager = sp.GetRequiredService<UserManager<TUser>>();
+            var userManager = sp.GetRequiredService<UserManager<User>>();
 
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
@@ -231,7 +248,7 @@ public static class IdentityApiEndpoints
             return TypedResults.Ok();
         });
 
-        async Task SendConfirmationEmailAsync(TUser user, UserManager<TUser> userManager, HttpContext context, string email, bool isChange = false)
+        async Task SendConfirmationEmailAsync(User user, UserManager<User> userManager, HttpContext context, string email, bool isChange = false)
         {
             if (confirmEmailEndpointName is null)
             {
