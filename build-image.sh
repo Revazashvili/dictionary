@@ -1,0 +1,1 @@
+docker build -t revazashvili/dictionary-api:latest -f src/DictionaryApi/Dockerfile .
