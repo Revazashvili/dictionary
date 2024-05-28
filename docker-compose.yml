@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.5'
 
 services:
   dictionary-db:
@@ -12,14 +12,22 @@ services:
     environment:
       - POSTGRES_PASSWORD=mysecretpassword
       - POSTGRES_USER=postgres
+    networks:
+      - dictionary
   
   dictionary-api:
     container_name: dictionary-api
-    build:
-      context: .
-      dockerfile: src/DictionaryApi/Dockerfile
+    image: revazashvili/dictionary-api:latest
+    restart: always
     depends_on: [dictionary-db]
     ports:
       - "80:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings:DictionaryDb=Host=dictionary-db;Port=5432;Database=Dictionary;User Id=postgres;Password=mysecretpassword;
+    networks: 
+      - dictionary
+        
+networks:
+  dictionary:
+    name: dictionary_custom
