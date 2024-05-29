@@ -43,6 +43,9 @@ public static class IdentityApiEndpoints
 
             return TypedResults.Ok(users);
         });
+        
+        
+        routeGroup.MapGet("/user-roles", async () => TypedResults.Ok(UserRoles.All));
 
         routeGroup.MapPost("/add-user", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] AddUserRequest addUserRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
