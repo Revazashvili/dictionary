@@ -32,7 +32,7 @@ public static class IdentityApiEndpoints
 
         var routeGroup = endpoints.MapGroup("identity");
 
-        routeGroup.MapGet("/", async ([FromServices] IServiceProvider sp,
+        routeGroup.MapGet("/users", async ([FromServices] IServiceProvider sp,
             CancellationToken cancellationToken) =>
         {
             var userManager = sp.GetRequiredService<UserManager<User>>();
@@ -41,7 +41,7 @@ public static class IdentityApiEndpoints
                 .Select(user => new UserResponse(user.Id, user.Email, user.Status))
                 .ToListAsync(cancellationToken);
 
-            return TypedResults.Ok(users);
+            return TypedResults.Ok(users); // TODO: return users if authenticated user is admin
         });
         
         
