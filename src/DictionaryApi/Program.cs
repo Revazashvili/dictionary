@@ -71,5 +71,29 @@ public static class WebApplicationExtensions
         var dictionaryDbContext = app.Services.CreateScope()
             .ServiceProvider.GetRequiredService<DictionaryDbContext>();
         await dictionaryDbContext.Database.MigrateAsync();
+        
+        if (app.Environment.IsDevelopment())
+        {
+            using var scope = app.Services.CreateScope();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var userStore = scope.ServiceProvider.GetRequiredService<IUserStore<User>>();
+            var emailStore = (IUserEmailStore<User>)userStore;
+            const string email = "dictionaryadmin@gmail.com";
+            var user = new User
+            {
+                Role = "admin",
+                Status = UserStatus.Active
+            };
+            
+            await userStore.SetUserNameAsync(user, email, CancellationToken.None);
+            await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+            var result = await userManager.CreateAsync(user, "Admin$1");
+
+            var resultText = result.Succeeded
+                ? "admin user successfully added to database"
+                : "can't add admin user to database";
+
+            Console.WriteLine(resultText);
+        }
     }
 }
