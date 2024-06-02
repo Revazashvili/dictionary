@@ -17,14 +17,16 @@ public class AddUserRequest
 
 public class UserResponse
 {
-    public UserResponse(string id, string email, UserStatus status)
+    public UserResponse(string id, string email, UserStatus status, string role)
     {
         Id = id;
         Email = email;
         Status = status;
+        Role = role;
     }
 
     public string Id { get; set; }
     public string Email { get; set; }
     public UserStatus Status { get; set; }
+    public string Role { get; set; }
 }

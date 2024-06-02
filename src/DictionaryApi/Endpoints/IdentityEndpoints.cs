@@ -32,16 +32,31 @@ public static class IdentityApiEndpoints
 
         var routeGroup = endpoints.MapGroup("identity");
 
+        routeGroup.MapGet("/user", async Task<Results<Ok<UserResponse>, ProblemHttpResult>>
+            ([FromServices] IServiceProvider sp, HttpContext context) =>
+        {
+            var userManager = sp.GetRequiredService<UserManager<User>>();
+
+            var user = await userManager.GetUserAsync(context.User);
+
+            if (user is null)
+                return TypedResults.Problem("can't find user", statusCode: StatusCodes.Status400BadRequest);
+
+            var userResponse = new UserResponse(user.Id, user.Email!, user.Status, user.Role);
+            
+            return TypedResults.Ok(userResponse);
+        });
+        
         routeGroup.MapGet("/users", async ([FromServices] IServiceProvider sp,
             CancellationToken cancellationToken) =>
         {
             var userManager = sp.GetRequiredService<UserManager<User>>();
 
             var users = await userManager.Users
-                .Select(user => new UserResponse(user.Id, user.Email, user.Status))
+                .Select(user => new UserResponse(user.Id, user.Email!, user.Status, user.Role))
                 .ToListAsync(cancellationToken);
 
-            return TypedResults.Ok(users); // TODO: return users if authenticated user is admin
+            return TypedResults.Ok(users);
         });
         
         
