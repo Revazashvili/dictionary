@@ -17,7 +17,7 @@ namespace DictionaryApi.Endpoints;
 
 public static class IdentityApiEndpoints
 {
-    private static readonly EmailAddressAttribute _emailAddressAttribute = new();
+    private static readonly EmailAddressAttribute EmailAddressAttribute = new();
 
     public static IEndpointConventionBuilder MapCustomIdentityApi(this IEndpointRouteBuilder endpoints)
     {
@@ -60,10 +60,10 @@ public static class IdentityApiEndpoints
         });
         
         
-        routeGroup.MapGet("/user-roles", async () => TypedResults.Ok(UserRoles.All));
+        routeGroup.MapGet("/user-roles", () => Task.FromResult(TypedResults.Ok(UserRoles.All)));
 
         routeGroup.MapPost("/add-user", async Task<Results<Ok, ValidationProblem>>
-            ([FromBody] AddUserRequest addUserRequest, HttpContext context, [FromServices] IServiceProvider sp) =>
+            ([FromBody] AddUserRequest addUserRequest, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<User>>();
 
@@ -76,7 +76,7 @@ public static class IdentityApiEndpoints
             var emailStore = (IUserEmailStore<User>)userStore;
             var email = addUserRequest.Email;
 
-            if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
+            if (string.IsNullOrEmpty(email) || !EmailAddressAttribute.IsValid(email))
             {
                 return CreateValidationProblem(IdentityResult.Failed(userManager.ErrorDescriber.InvalidEmail(email)));
             }
@@ -103,8 +103,8 @@ public static class IdentityApiEndpoints
         {
             var signInManager = sp.GetRequiredService<SignInManager<User>>();
 
-            var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
-            var isPersistent = (useCookies == true) && (useSessionCookies != true);
+            var useCookieScheme = useCookies == true || (useSessionCookies == true);
+            var isPersistent = useCookies == true && (useSessionCookies != true);
             signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
 
             var result = await signInManager.PasswordSignInAsync(login.Email, login.Password, isPersistent, lockoutOnFailure: true);
@@ -338,14 +338,10 @@ public static class IdentityApiEndpoints
     }
 
     [AttributeUsage(AttributeTargets.Parameter)]
-    private sealed class FromBodyAttribute : Attribute, IFromBodyMetadata
-    {
-    }
+    private sealed class FromBodyAttribute : Attribute, IFromBodyMetadata;
 
     [AttributeUsage(AttributeTargets.Parameter)]
-    private sealed class FromServicesAttribute : Attribute, IFromServiceMetadata
-    {
-    }
+    private sealed class FromServicesAttribute : Attribute, IFromServiceMetadata;
 
     [AttributeUsage(AttributeTargets.Parameter)]
     private sealed class FromQueryAttribute : Attribute, IFromQueryMetadata
