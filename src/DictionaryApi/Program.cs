@@ -29,7 +29,6 @@ public static class WebApplicationExtensions
             builder.AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowAnyOrigin()
-                .AllowCredentials()
         ));
 
         var connectionString = configuration.GetConnectionString("DictionaryDb");
