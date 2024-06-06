@@ -65,6 +65,7 @@ public static class WebApplicationExtensions
         apiGroup.MapCustomIdentityApi();
         apiGroup.MapTopicApi();
         apiGroup.MapSubTopicApi();
+        apiGroup.MapEntriesApi();
 
         app.UseSwagger();
         app.UseSwaggerUI();
