@@ -18,18 +18,13 @@ app.Run();
 
 public static class WebApplicationExtensions
 {
-    private const string ApiCorsPolicy = "APICorsPolicy";
     public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication()
             .AddBearerToken(IdentityConstants.BearerScheme);
         services.AddAuthorizationBuilder();
 
-        services.AddCors(options => options.AddPolicy(ApiCorsPolicy, builder =>
-            builder.AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowAnyOrigin()
-        ));
+        services.AddCors();
 
         var connectionString = configuration.GetConnectionString("DictionaryDb");
         services.AddDbContext<DictionaryDbContext>(options => 
@@ -60,7 +55,13 @@ public static class WebApplicationExtensions
 
     public static async Task Configure(this WebApplication app)
     {
-        app.UseCors(ApiCorsPolicy);
+        app.UseCors(builder => builder
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(_ => true)
+            .AllowCredentials()
+        );
+        
         var apiGroup = app.MapGroup("/api");
         apiGroup.MapCustomIdentityApi();
         apiGroup.MapTopicApi();
