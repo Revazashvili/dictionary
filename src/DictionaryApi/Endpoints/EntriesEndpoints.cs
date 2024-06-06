@@ -32,7 +32,7 @@ internal static class EntriesEndpoints
             id == 0 ? Results.BadRequest("id is not valid")
                 : Results.Ok(await entryService.GetByIdAsync(id, cancellationToken)));
 
-        entriesEndpointRouteBuilder.MapPost("topic", async ([FromBody] AddEntryRequest addEntryRequest,
+        entriesEndpointRouteBuilder.MapPost("entry", async ([FromBody] AddEntryRequest addEntryRequest,
                 IEntryService entryService, CancellationToken cancellationToken) =>
             {
                 addEntryRequest.Validate();
@@ -44,7 +44,7 @@ internal static class EntriesEndpoints
             .Produces<int>()
             .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
 
-        entriesEndpointRouteBuilder.MapPut("topic", async ([FromBody] UpdateEntryRequest updateEntryRequest,
+        entriesEndpointRouteBuilder.MapPut("entry", async ([FromBody] UpdateEntryRequest updateEntryRequest,
                 IEntryService entryService, CancellationToken cancellationToken) =>
             {
                 updateEntryRequest.Validate();
@@ -55,7 +55,7 @@ internal static class EntriesEndpoints
             .Accepts<UpdateTopicRequest>(MediaTypeNames.Application.Json)
             .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
 
-        entriesEndpointRouteBuilder.MapDelete("topic/{id:int}",
+        entriesEndpointRouteBuilder.MapDelete("entry/{id:int}",
                 async (int id, IEntryService entryService, CancellationToken cancellationToken) =>
                 {
                     if (id == 0)
