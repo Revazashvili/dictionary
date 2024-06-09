@@ -39,6 +39,7 @@ public static class WebApplicationExtensions
 
         services.AddScoped<ITopicService, TopicService>();
         services.AddScoped<IEntryService, EntryService>();
+        services.AddScoped<IMultimediaService, MultimediaService>();
 
         services.ConfigureHttpJsonOptions(options =>
         {
@@ -67,6 +68,7 @@ public static class WebApplicationExtensions
         apiGroup.MapTopicApi();
         apiGroup.MapSubTopicApi();
         apiGroup.MapEntriesApi();
+        apiGroup.MapMultimediaApi();
 
         app.UseSwagger();
         app.UseSwaggerUI();
