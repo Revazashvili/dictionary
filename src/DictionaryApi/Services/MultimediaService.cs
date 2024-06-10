@@ -2,7 +2,7 @@ namespace DictionaryApi.Services;
 
 public class MultimediaService : IMultimediaService
 {
-    private const string FolderPath = "/images";
+    private const string FolderPath = "../images";
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public MultimediaService(IHttpContextAccessor httpContextAccessor)

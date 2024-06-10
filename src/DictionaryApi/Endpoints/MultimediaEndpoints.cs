@@ -10,7 +10,11 @@ public static class MultimediaEndpoints
 {
     public static void MapMultimediaApi(this IEndpointRouteBuilder multimediaEndpointRouteBuilder)
     {
-        multimediaEndpointRouteBuilder.MapGet("multimedia/{fileName}",
+        var multimediaEndpointRouteBuilderGroup = multimediaEndpointRouteBuilder
+            .MapGroup("multimedia")
+            .DisableAntiforgery();
+
+        multimediaEndpointRouteBuilderGroup.MapGet("/{fileName}",
             async ([Required] string fileName, IMultimediaService multimediaService) =>
             {
                 if (string.IsNullOrEmpty(fileName))
@@ -18,10 +22,9 @@ public static class MultimediaEndpoints
 
                 var file = await multimediaService.GetAsync(fileName);
                 return Results.File(file, MediaTypeNames.Image.Jpeg);
-            })
-            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
+            });
 
-        multimediaEndpointRouteBuilder.MapPost("multimedia", async ([FromForm] IFormFile file, 
+        multimediaEndpointRouteBuilderGroup.MapPost("/", async ([FromForm] IFormFile file,
                 IMultimediaService multimediaService) =>
             {
                 if (file is null)
@@ -31,7 +34,7 @@ public static class MultimediaEndpoints
 
                 return Results.Ok(url);
             })
-            .Accepts<IFormFile>(MediaTypeNames.Image.Jpeg)
+            .Accepts<IFormFile>(MediaTypeNames.Multipart.FormData)
             .Produces<string>()
             .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
     }
