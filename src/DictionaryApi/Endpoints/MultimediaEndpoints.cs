@@ -10,7 +10,7 @@ public static class MultimediaEndpoints
 {
     public static void MapMultimediaApi(this IEndpointRouteBuilder multimediaEndpointRouteBuilder)
     {
-        multimediaEndpointRouteBuilder.MapGet("topic/{fileName}",
+        multimediaEndpointRouteBuilder.MapGet("multimedia/{fileName}",
             async ([Required] string fileName, IMultimediaService multimediaService) =>
             {
                 if (string.IsNullOrEmpty(fileName))
@@ -21,7 +21,7 @@ public static class MultimediaEndpoints
             })
             .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
 
-        multimediaEndpointRouteBuilder.MapPost("topic", async ([FromForm] IFormFile file, 
+        multimediaEndpointRouteBuilder.MapPost("multimedia", async ([FromForm] IFormFile file, 
                 IMultimediaService multimediaService) =>
             {
                 if (file is null)
