@@ -44,7 +44,7 @@ public static class SubTopicEndpoints
                     return Results.Ok();
                 })
             .Accepts<int>(MediaTypeNames.Application.Json)
-            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
         
         subTopicEndpointRouteBuilder.MapPut("topic/subTopic/activate/{id:int}",
                 async (int id, ITopicService topicService, CancellationToken cancellationToken) =>

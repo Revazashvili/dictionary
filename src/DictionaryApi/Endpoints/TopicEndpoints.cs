@@ -53,7 +53,7 @@ public static class TopicEndpoints
                     return Results.Ok();
                 })
             .Accepts<int>(MediaTypeNames.Application.Json)
-            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
         
         topicEndpointRouteBuilder.MapPut("topic/activate/{id:int}",
                 async (int id, ITopicService topicService, CancellationToken cancellationToken) =>

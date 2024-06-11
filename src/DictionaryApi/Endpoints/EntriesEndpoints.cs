@@ -65,7 +65,7 @@ internal static class EntriesEndpoints
                     return Results.Ok();
                 })
             .Accepts<int>(MediaTypeNames.Application.Json)
-            .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
         
         entriesEndpointRouteBuilder.MapPut("entry/activate/{id:int}",
                 async (int id, IEntryService entryService, CancellationToken cancellationToken) =>
