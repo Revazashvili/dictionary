@@ -9,13 +9,13 @@ public class User : IdentityUser
     public string Role { get; set; }
 
     [NotMapped]
-    public bool IdAdmin => Role == UserRoles.Admin;
+    public bool IsAdmin => Role == UserRoles.Admin;
     
     [NotMapped]
-    public bool IdSuperAdmin => Role == UserRoles.SuperAdmin;
+    public bool IsSuperAdmin => Role == UserRoles.SuperAdmin;
     
     [NotMapped]
-    public bool IdViewer => Role == UserRoles.Viewer;
+    public bool IsViewer => Role == UserRoles.Viewer;
 }
 
 public static class UserRoles
