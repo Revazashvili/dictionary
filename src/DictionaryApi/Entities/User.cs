@@ -12,6 +12,6 @@ public class User : IdentityUser
 
 public static class UserRoles
 {
-    public static readonly string[] All = ["admin", "super_admin"];
-    public static readonly string[] Admin = ["admin", "super_admin"];
+    public static readonly string[] All = [ "viewer", "admin", "super_admin" ];
+    public static readonly string[] Admin = [ "admin", "super_admin" ];
 }
