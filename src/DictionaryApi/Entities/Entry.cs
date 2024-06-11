@@ -1,8 +1,19 @@
 namespace DictionaryApi.Entities;
 
+/// <summary>
+/// სიტყვა
+/// </summary>
 public class Entry
 {
+    /// <summary>
+    /// სიტყვის იდენთიფიკატორი
+    /// </summary>
     public int Id { get; set; }
+    
+    /// <summary>
+    /// სიტყვის სტატუსი
+    /// </summary>
+    public EntityStatus Status { get; set; }
     
     /// <summary>
     /// მეთაური სიტყვა ქართულად
