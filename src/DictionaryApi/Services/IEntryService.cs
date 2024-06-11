@@ -13,4 +13,6 @@ internal interface IEntryService
     Task<int> AddAsync(AddEntryRequest request, CancellationToken cancellationToken);
     Task UpdateAsync(UpdateEntryRequest request, CancellationToken cancellationToken);
     Task DeleteAsync(int id, CancellationToken cancellationToken);
+    Task ActivateAsync(int id, CancellationToken cancellationToken);
+    Task DeactivateAsync(int id, CancellationToken cancellationToken);
 }

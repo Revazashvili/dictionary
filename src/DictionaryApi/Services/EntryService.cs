@@ -84,7 +84,8 @@ internal class EntryService : IEntryService
             StylisticQualification = request.StylisticQualification,
             Synonym = request.Synonym,
             UsageNote = request.UsageNote,
-            SubTopic = subTopic
+            SubTopic = subTopic,
+            Status = EntityStatus.InActive
         };
 
         var entityEntry = await _context.Entries.AddAsync(entry, cancellationToken);
@@ -121,6 +122,30 @@ internal class EntryService : IEntryService
         var entry = await GetByIdAsync(id, cancellationToken);
 
         _context.Entries.Remove(entry);
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ActivateAsync(int id, CancellationToken cancellationToken)
+    {
+        var entry = await GetByIdAsync(id, cancellationToken);
+
+        if (entry.Status == EntityStatus.Active)
+            throw new Exception("Entry is already active");
+
+        entry.Status = EntityStatus.Active;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeactivateAsync(int id, CancellationToken cancellationToken)
+    {
+        var entry = await GetByIdAsync(id, cancellationToken);
+
+        if (entry.Status == EntityStatus.InActive)
+            throw new Exception("Entry is already inactive");
+
+        entry.Status = EntityStatus.InActive;
 
         await _context.SaveChangesAsync(cancellationToken);
     }

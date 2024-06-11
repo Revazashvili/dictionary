@@ -14,4 +14,8 @@ public interface ITopicService
     Task DeleteAsync(int id, CancellationToken cancellationToken);
     Task DeleteSubTopicAsync(int id, CancellationToken cancellationToken);
     Task<SubTopic> GetSubTopicAsync(int subTopicId, CancellationToken cancellationToken);
+    Task ActivateTopicAsync(int id, CancellationToken cancellationToken);
+    Task DeactivateTopicAsync(int id, CancellationToken cancellationToken);
+    Task ActivateSubTopicAsync(int id, CancellationToken cancellationToken);
+    Task DeactivateSubTopicAsync(int id, CancellationToken cancellationToken);
 }

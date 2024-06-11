@@ -43,7 +43,8 @@ public class TopicService : ITopicService
         var topic = new Topic
         {
             GeorgianName = request.GeorgianName,
-            EnglishName = request.EnglishName
+            EnglishName = request.EnglishName,
+            Status = EntityStatus.InActive
         };
         var entry = await _context.Topics.AddAsync(topic, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
@@ -63,7 +64,8 @@ public class TopicService : ITopicService
         var subTopic = new SubTopic
         {
             GeorgianName = request.GeorgianName,
-            EnglishName = request.EnglishName
+            EnglishName = request.EnglishName,
+            Status = EntityStatus.InActive
         };
         topic.SubTopics.Add(subTopic);
 
@@ -121,6 +123,54 @@ public class TopicService : ITopicService
             throw new Exception("SubTopic not found");
         
         return subTopic;
+    }
+
+    public async Task ActivateTopicAsync(int id, CancellationToken cancellationToken)
+    {
+        var topic = await GetByIdAsync(id, cancellationToken);
+
+        if (topic.Status == EntityStatus.Active)
+            throw new Exception("Topic is already active");
+        
+        topic.Status = EntityStatus.Active;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeactivateTopicAsync(int id, CancellationToken cancellationToken)
+    {
+        var topic = await GetByIdAsync(id, cancellationToken);
+
+        if (topic.Status == EntityStatus.InActive)
+            throw new Exception("Topic is already inactive");
+        
+        topic.Status = EntityStatus.InActive;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task DeactivateSubTopicAsync(int id, CancellationToken cancellationToken)
+    {
+        var subTopic = await GetSubTopicAsync(id, cancellationToken);
+        
+        if (subTopic.Status == EntityStatus.InActive)
+            throw new Exception("SubTopic is already inactive");
+
+        subTopic.Status = EntityStatus.InActive;
+
+        await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task ActivateSubTopicAsync(int id, CancellationToken cancellationToken)
+    {
+        var subTopic = await GetSubTopicAsync(id, cancellationToken);
+        
+        if (subTopic.Status == EntityStatus.Active)
+            throw new Exception("SubTopic is already active");
+
+        subTopic.Status = EntityStatus.Active;
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
 

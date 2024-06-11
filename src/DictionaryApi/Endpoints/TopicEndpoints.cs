@@ -54,5 +54,29 @@ public static class TopicEndpoints
                 })
             .Accepts<int>(MediaTypeNames.Application.Json)
             .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
+        
+        topicEndpointRouteBuilder.MapPut("topic/activate/{id:int}",
+                async (int id, ITopicService topicService, CancellationToken cancellationToken) =>
+                {
+                    if (id == 0)
+                        return Results.BadRequest("id is not valid");
+
+                    await topicService.ActivateTopicAsync(id, cancellationToken);
+                    return Results.Ok();
+                })
+            .Accepts<int>(MediaTypeNames.Application.Json)
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
+        
+        topicEndpointRouteBuilder.MapPut("topic/deactivate/{id:int}",
+                async (int id, ITopicService topicService, CancellationToken cancellationToken) =>
+                {
+                    if (id == 0)
+                        return Results.BadRequest("id is not valid");
+
+                    await topicService.DeactivateTopicAsync(id, cancellationToken);
+                    return Results.Ok();
+                })
+            .Accepts<int>(MediaTypeNames.Application.Json)
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
     }
 }

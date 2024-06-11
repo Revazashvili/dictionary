@@ -66,5 +66,30 @@ internal static class EntriesEndpoints
                 })
             .Accepts<int>(MediaTypeNames.Application.Json)
             .AddEndpointFilter<AdminPrivilegesEndpointFilter>();
+        
+        entriesEndpointRouteBuilder.MapPut("entry/activate/{id:int}",
+                async (int id, IEntryService entryService, CancellationToken cancellationToken) =>
+                {
+                    if (id == 0)
+                        return Results.BadRequest("id is not valid");
+
+                    await entryService.ActivateAsync(id, cancellationToken);
+                    return Results.Ok();
+                })
+            .Accepts<int>(MediaTypeNames.Application.Json)
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
+        
+        entriesEndpointRouteBuilder.MapPut("entry/deactivate/{id:int}",
+                async (int id, IEntryService entryService, CancellationToken cancellationToken) =>
+                {
+                    if (id == 0)
+                        return Results.BadRequest("id is not valid");
+
+                    await entryService.DeactivateAsync(id, cancellationToken);
+                    return Results.Ok();
+                })
+            .Accepts<int>(MediaTypeNames.Application.Json)
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
+
     }
 }
