@@ -24,7 +24,7 @@ public class AdminPrivilegesEndpointFilter : IEndpointFilter
         if (user is null)
             return new UnauthorizedResult();
         
-        if (!user.IdAdmin() && !_webHostEnvironment.IsDevelopment())
+        if (!user.IdAdmin && !_webHostEnvironment.IsDevelopment())
             return new UnauthorizedResult();
         
         return await next(context);
