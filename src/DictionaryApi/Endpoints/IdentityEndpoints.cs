@@ -42,7 +42,7 @@ public static class IdentityApiEndpoints
             if (user is null)
                 return TypedResults.Problem("can't find user", statusCode: StatusCodes.Status400BadRequest);
 
-            var userResponse = new UserResponse(user.Id, user.Email!, user.Status, user.Role);
+            var userResponse = new UserResponse(user.Id, user.Email!, user.Status, user.Role, user.IsAdmin, user.IsSuperAdmin, user.IsViewer);
             
             return TypedResults.Ok(userResponse);
         });
@@ -53,7 +53,7 @@ public static class IdentityApiEndpoints
             var userManager = sp.GetRequiredService<UserManager<User>>();
 
             var users = await userManager.Users
-                .Select(user => new UserResponse(user.Id, user.Email!, user.Status, user.Role))
+                .Select(user => new UserResponse(user.Id, user.Email!, user.Status, user.Role, user.IsAdmin, user.IsSuperAdmin, user.IsViewer))
                 .ToListAsync(cancellationToken);
 
             return TypedResults.Ok(users);
