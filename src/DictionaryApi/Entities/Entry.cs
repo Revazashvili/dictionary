@@ -17,6 +17,5 @@ public class Entry
     public string Synonym { get; set; }
     public string UsageNote { get; set; }
     public string ImageUrl { get; set; }
-    public Topic Topic { get; set; }
     public SubTopic SubTopic { get; set; }
 }
