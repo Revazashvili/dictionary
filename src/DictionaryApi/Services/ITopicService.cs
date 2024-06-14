@@ -6,6 +6,7 @@ namespace DictionaryApi.Services;
 public interface ITopicService
 {
     Task<IEnumerable<Topic>> GetAllAsync(CancellationToken cancellationToken);
+    Task<int> GetCountAsync(CancellationToken cancellationToken);
     Task<Topic> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task<int> AddAsync(AddTopicRequest request, CancellationToken cancellationToken);
     Task<int> AddSubTopicAsync(AddSubTopicRequest request, CancellationToken cancellationToken);

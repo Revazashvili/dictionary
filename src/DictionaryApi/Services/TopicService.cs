@@ -23,6 +23,13 @@ public class TopicService : ITopicService
         return topics;
     }
 
+    public async Task<int> GetCountAsync(CancellationToken cancellationToken)
+    {
+        var count = await _context.Topics.CountAsync(cancellationToken);
+
+        return count;
+    }
+
     public async Task<Topic> GetByIdAsync(int id,CancellationToken cancellationToken)
     {
         var topic = await _context.Topics

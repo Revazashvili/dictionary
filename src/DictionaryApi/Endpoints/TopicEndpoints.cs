@@ -14,6 +14,10 @@ public static class TopicEndpoints
         topicEndpointRouteBuilder.MapGet("topic",
             (ITopicService topicService, CancellationToken cancellationToken) =>
                 topicService.GetAllAsync(cancellationToken));
+        
+        topicEndpointRouteBuilder.MapGet("topic/count",
+            (ITopicService topicService, CancellationToken cancellationToken) =>
+                topicService.GetCountAsync(cancellationToken));
 
         topicEndpointRouteBuilder.MapGet("topic/{id:int}",
             async ([Required] int id, ITopicService topicService, CancellationToken cancellationToken) => 
