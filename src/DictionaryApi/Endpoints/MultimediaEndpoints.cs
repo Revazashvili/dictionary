@@ -15,22 +15,21 @@ public static class MultimediaEndpoints
             .DisableAntiforgery();
 
         multimediaEndpointRouteBuilderGroup.MapGet("/{fileName}",
-            async ([Required] string fileName, IMultimediaService multimediaService) =>
+            async ([Required] string fileName, IMultimediaService multimediaService, CancellationToken cancellationToken) =>
             {
                 if (string.IsNullOrEmpty(fileName))
                     return Results.BadRequest("file name is not valid");
 
-                var file = await multimediaService.GetAsync(fileName);
-                return Results.File(file, MediaTypeNames.Image.Jpeg);
+                var multimedia = await multimediaService.GetAsync(fileName, cancellationToken);
+                return Results.File(multimedia.Blob, multimedia.ContentType);
             });
 
         multimediaEndpointRouteBuilderGroup.MapPost("/", async ([FromForm] IFormFile file,
-                IMultimediaService multimediaService) =>
+                IMultimediaService multimediaService, CancellationToken cancellationToken) =>
             {
-                if (file is null)
-                    throw new ArgumentNullException(nameof(file));
+                ArgumentNullException.ThrowIfNull(file);
 
-                var url = await multimediaService.UploadAsync(file);
+                var url = await multimediaService.UploadAsync(file, cancellationToken);
 
                 return Results.Ok(url);
             })

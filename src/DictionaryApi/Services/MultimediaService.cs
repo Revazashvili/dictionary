@@ -1,52 +1,58 @@
+using DictionaryApi.Entities;
+using DictionaryApi.Persistence;
+using Microsoft.EntityFrameworkCore;
+
 namespace DictionaryApi.Services;
 
 public class MultimediaService : IMultimediaService
 {
-    private const string FolderPath = "../images";
+    private readonly DictionaryDbContext _context;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public MultimediaService(IHttpContextAccessor httpContextAccessor)
+    public MultimediaService(DictionaryDbContext context, IHttpContextAccessor httpContextAccessor)
     {
+        _context = context;
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<string> UploadAsync(IFormFile file)
+    public async Task<string> UploadAsync(IFormFile file, CancellationToken cancellationToken)
     {
-        var fileName = $"{Guid.NewGuid().ToString()}{file.FileName}";
-        
-        var filePath = GetFilePath(fileName);
-
-        await using (var fileStream = new FileStream(filePath, FileMode.Create))
+        var fileName = Guid.NewGuid().ToString();
+        await using (var stream = new MemoryStream())
         {
-            await file.CopyToAsync(fileStream);
+            await file.CopyToAsync(stream, cancellationToken);
+
+            var multimedia = new Multimedia
+            {
+                Blob = stream.ToArray(),
+                ContentType = file.ContentType,
+                FileName = fileName
+            };
+
+            await _context.Multimedia.AddAsync(multimedia, cancellationToken);
+
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
         return GetImageUrl(fileName);
     }
 
-    public Task<byte[]> GetAsync(string fileName)
+    public async Task<Multimedia> GetAsync(string fileName, CancellationToken cancellationToken)
     {
-        var filePath = GetFilePath(fileName);
+        var multimedia = await _context.Multimedia.FirstOrDefaultAsync(m => m.FileName == fileName, cancellationToken);
 
-        return File.ReadAllBytesAsync(filePath);
+        return multimedia;
     }
 
-    public Task RemoveAsync(string fileName)
+    public async Task RemoveAsync(string imageUrl, CancellationToken cancellationToken)
     {
-        var filePath = GetFilePath(fileName);
+        var fileName = imageUrl.Split('/').Last();
         
-        File.Delete(filePath);
-        
-        return Task.CompletedTask;
-    }
-    
-    private string GetFilePath(string imageName)
-    {
-        if (!Directory.Exists(FolderPath))
-            Directory.CreateDirectory(FolderPath);
+        var multimedia = await _context.Multimedia.FirstOrDefaultAsync(m => m.FileName == fileName, cancellationToken);
 
-        var filePath = Path.Combine(FolderPath, $"{imageName}");
-        return filePath;
+        _context.Multimedia.Remove(multimedia);
+
+        await _context.SaveChangesAsync(cancellationToken);
     }
 
     private string GetImageUrl(string imageName)
