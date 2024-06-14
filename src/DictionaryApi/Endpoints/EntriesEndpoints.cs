@@ -16,8 +16,8 @@ internal static class EntriesEndpoints
                 entryService.GetAllAsync(new Pagination(pageNumber, pageSize),cancellationToken));
         
         entriesEndpointRouteBuilder.MapGet("entry/count",
-            (int pageNumber, int pageSize, IEntryService entryService, CancellationToken cancellationToken) =>
-                entryService.GetCountAsync(new Pagination(pageNumber, pageSize),cancellationToken));
+            (IEntryService entryService, CancellationToken cancellationToken) =>
+                entryService.GetCountAsync(cancellationToken));
         
         entriesEndpointRouteBuilder.MapGet("entry/for-sub-topic",
             (int subTopicId, int pageNumber, int pageSize, IEntryService entryService, CancellationToken cancellationToken) =>

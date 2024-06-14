@@ -26,11 +26,9 @@ internal class EntryService : IEntryService
         return entries;
     }
 
-    public async Task<int> GetCountAsync(Pagination pagination, CancellationToken cancellationToken)
+    public async Task<int> GetCountAsync(CancellationToken cancellationToken)
     {
-        var count = await _context.Entries
-            .Paged(pagination)
-            .CountAsync(cancellationToken);
+        var count = await _context.Entries.CountAsync(cancellationToken);
 
         return count;
     }
