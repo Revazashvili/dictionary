@@ -10,11 +10,13 @@ internal class EntryService : IEntryService
 {
     private readonly DictionaryDbContext _context;
     private readonly ITopicService _topicService;
+    private readonly IMultimediaService _multimediaService;
 
-    public EntryService(DictionaryDbContext context, ITopicService topicService)
+    public EntryService(DictionaryDbContext context, ITopicService topicService, IMultimediaService multimediaService)
     {
         _context = context;
         _topicService = topicService;
+        _multimediaService = multimediaService;
     }
 
     public async Task<IEnumerable<Entry>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
@@ -94,34 +96,61 @@ internal class EntryService : IEntryService
 
     public async Task UpdateAsync(UpdateEntryRequest request, CancellationToken cancellationToken)
     {
-        var entry = await GetByIdAsync(request.Id, cancellationToken);
-        var subTopic = await _topicService.GetSubTopicAsync(request.SubTopicId, cancellationToken);
+        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var entry = await GetByIdAsync(request.Id, cancellationToken);
+            var subTopic = await _topicService.GetSubTopicAsync(request.SubTopicId, cancellationToken);
 
-        entry.GeorgianHeadword = request.GeorgianHeadword;
-        entry.EnglishHeadword = request.EnglishHeadword;
-        entry.GeorgianDefinition = request.GeorgianDefinition;
-        entry.EnglishDefinition = request.EnglishDefinition;
-        entry.FunctionalLabel = request.FunctionalLabel;
-        entry.Idiom = request.Idiom;
-        entry.GeorgianIllustrationSentence = request.GeorgianIllustrationSentence;
-        entry.EnglishIllustrationSentence = request.EnglishIllustrationSentence;
-        entry.ImageUrl = request.ImageUrl;
-        entry.Source = request.Source;
-        entry.StylisticQualification = request.StylisticQualification;
-        entry.Synonym = request.Synonym;
-        entry.UsageNote = request.UsageNote;
-        entry.SubTopic = subTopic;
+            entry.GeorgianHeadword = request.GeorgianHeadword;
+            entry.EnglishHeadword = request.EnglishHeadword;
+            entry.GeorgianDefinition = request.GeorgianDefinition;
+            entry.EnglishDefinition = request.EnglishDefinition;
+            entry.FunctionalLabel = request.FunctionalLabel;
+            entry.Idiom = request.Idiom;
+            entry.GeorgianIllustrationSentence = request.GeorgianIllustrationSentence;
+            entry.EnglishIllustrationSentence = request.EnglishIllustrationSentence;
+            if (entry.ImageUrl != request.ImageUrl)
+            {
+                await _multimediaService.RemoveAsync(entry.ImageUrl, cancellationToken);
+                entry.ImageUrl = request.ImageUrl;
+            }
 
-        await _context.SaveChangesAsync(cancellationToken);
+            entry.Source = request.Source;
+            entry.StylisticQualification = request.StylisticQualification;
+            entry.Synonym = request.Synonym;
+            entry.UsageNote = request.UsageNote;
+            entry.SubTopic = subTopic;
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+        }
     }
 
     public async Task DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var entry = await GetByIdAsync(id, cancellationToken);
+        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        try
+        {
+            var entry = await GetByIdAsync(id, cancellationToken);
 
-        _context.Entries.Remove(entry);
+            _context.Entries.Remove(entry);
 
-        await _context.SaveChangesAsync(cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await _multimediaService.RemoveAsync(entry.ImageUrl, cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+        }
     }
 
     public async Task ActivateAsync(int id, CancellationToken cancellationToken)
