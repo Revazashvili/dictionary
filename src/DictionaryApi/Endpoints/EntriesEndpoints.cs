@@ -19,10 +19,6 @@ internal static class EntriesEndpoints
             (IEntryService entryService, CancellationToken cancellationToken) =>
                 entryService.GetCountAsync(cancellationToken));
         
-        entriesEndpointRouteBuilder.MapGet("entry/for-sub-topic",
-            (int subTopicId, int pageNumber, int pageSize, IEntryService entryService, CancellationToken cancellationToken) =>
-                entryService.GetAllForSubTopicAsync(subTopicId, new Pagination(pageNumber, pageSize),cancellationToken));
-
         entriesEndpointRouteBuilder.MapGet("entry/{id:int}",
             async ([Required] int id, IEntryService entryService, CancellationToken cancellationToken) => 
             id == 0 ? Results.BadRequest("id is not valid")

@@ -35,16 +35,6 @@ internal class EntryService : IEntryService
         return count;
     }
 
-    public async Task<IEnumerable<Entry>> GetAllForSubTopicAsync(int subTopicId, Pagination pagination, CancellationToken cancellationToken)
-    {
-        var entries = await _context.Entries
-            .Where(entry => entry.SubTopic.Id == subTopicId)
-            .Paged(pagination)
-            .ToListAsync(cancellationToken);
-
-        return entries;
-    }
-
     public async Task<Entry> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         var entry = await _context.Entries
