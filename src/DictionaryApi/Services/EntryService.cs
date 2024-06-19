@@ -45,15 +45,6 @@ internal class EntryService : IEntryService
         return entries;
     }
 
-    public async Task<IEnumerable<Entry>> SearchAsync(string searchText, CancellationToken cancellationToken)
-    {
-        var entries = await _context.Entries
-            .Where(entry => entry.GeorgianHeadword.Contains(searchText) || entry.EnglishHeadword.Contains(searchText))
-            .ToListAsync(cancellationToken);
-
-        return entries;
-    }
-
     public async Task<Entry> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         var entry = await _context.Entries
