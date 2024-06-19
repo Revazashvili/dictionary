@@ -1,3 +1,5 @@
+using DictionaryApi.Entities;
+
 namespace DictionaryApi.Models;
 
 public class BaseEntryRequest
@@ -59,4 +61,29 @@ public class UpdateEntryRequest : BaseEntryRequest
         
         base.Validate();
     }
+}
+
+public class BaseEntryFilterModel
+{
+    public BaseEntryFilterModel(string searchText, int? subTopicId, EntityStatus? status)
+    {
+        SearchText = searchText;
+        SubTopicId = subTopicId;
+        Status = status;
+    }
+
+    public string SearchText { get; set; }
+    public int? SubTopicId { get; set; }
+    public EntityStatus? Status { get; set; }
+}
+
+public class EntryFilterModelWithPagination : BaseEntryFilterModel
+{
+    public EntryFilterModelWithPagination(int pageNumber, int pageSize, string searchText, int? subTopicId, EntityStatus? status)
+        : base(searchText, subTopicId, status)
+    {
+        Pagination = new Pagination(pageNumber, pageSize);
+    }
+
+    public Pagination Pagination { get; set; }
 }

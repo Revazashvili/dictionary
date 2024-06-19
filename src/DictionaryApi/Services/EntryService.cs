@@ -19,18 +19,18 @@ internal class EntryService : IEntryService
         _multimediaService = multimediaService;
     }
 
-    public async Task<IEnumerable<Entry>> GetAllAsync(Pagination pagination, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Entry>> GetAllAsync(EntryFilterModelWithPagination filter, CancellationToken cancellationToken)
     {
-        var entries = await _context.Entries
-            .Paged(pagination)
+        var entries = await GetEntriesQueryable(filter)
+            .Paged(filter.Pagination)
             .ToListAsync(cancellationToken);
 
         return entries;
     }
 
-    public async Task<int> GetCountAsync(CancellationToken cancellationToken)
+    public async Task<int> GetCountAsync(BaseEntryFilterModel filter, CancellationToken cancellationToken)
     {
-        var count = await _context.Entries.CountAsync(cancellationToken);
+        var count = await GetEntriesQueryable(filter).CountAsync(cancellationToken);
 
         return count;
     }
@@ -157,4 +157,24 @@ internal class EntryService : IEntryService
 
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    #region private
+
+    private IQueryable<Entry> GetEntriesQueryable(BaseEntryFilterModel filter)
+    {
+        var entriesQueryable = _context.Entries.AsQueryable();
+
+        if (!string.IsNullOrEmpty(filter.SearchText))
+            entriesQueryable = entriesQueryable.Where(entry => entry.GeorgianHeadword.Contains(filter.SearchText) || entry.EnglishHeadword.Contains(filter.SearchText));
+
+        if (filter.SubTopicId.HasValue)
+            entriesQueryable = entriesQueryable.Where(entry => entry.SubTopic.Id == filter.SubTopicId.Value);
+
+        if (filter.Status.HasValue)
+            entriesQueryable = entriesQueryable.Where(entry => entry.Status == filter.Status.Value);
+        
+        return entriesQueryable;
+    }
+
+    #endregion
 }

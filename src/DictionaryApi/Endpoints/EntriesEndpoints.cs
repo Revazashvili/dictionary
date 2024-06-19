@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using DictionaryApi.EndpointFilters;
+using DictionaryApi.Entities;
 using DictionaryApi.Models;
 using DictionaryApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,13 @@ internal static class EntriesEndpoints
     internal static void MapEntriesApi(this IEndpointRouteBuilder entriesEndpointRouteBuilder)
     {
         entriesEndpointRouteBuilder.MapGet("entry",
-            (int pageNumber, int pageSize, IEntryService entryService, CancellationToken cancellationToken) =>
-                entryService.GetAllAsync(new Pagination(pageNumber, pageSize),cancellationToken));
+            ([Required] int pageNumber, [Required] int pageSize, string searchText, int? subTopicId,
+                    EntityStatus? status, IEntryService entryService, CancellationToken cancellationToken) =>
+                entryService.GetAllAsync(new EntryFilterModelWithPagination(pageNumber, pageSize, searchText, subTopicId, status), cancellationToken));
         
         entriesEndpointRouteBuilder.MapGet("entry/count",
-            (IEntryService entryService, CancellationToken cancellationToken) =>
-                entryService.GetCountAsync(cancellationToken));
+            (string searchText, int? subTopicId, EntityStatus? status, IEntryService entryService, CancellationToken cancellationToken) =>
+                entryService.GetCountAsync(new BaseEntryFilterModel(searchText, subTopicId, status), cancellationToken));
         
         entriesEndpointRouteBuilder.MapGet("entry/{id:int}",
             async ([Required] int id, IEntryService entryService, CancellationToken cancellationToken) => 
