@@ -38,6 +38,7 @@ internal class EntryService : IEntryService
     public async Task<Entry> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         var entry = await _context.Entries
+            .Include(e => e.SubTopic)
             .FirstOrDefaultAsync(entry => entry.Id == id, cancellationToken);
 
         if (entry is null)
@@ -162,7 +163,9 @@ internal class EntryService : IEntryService
 
     private IQueryable<Entry> GetEntriesQueryable(BaseEntryFilterModel filter)
     {
-        var entriesQueryable = _context.Entries.AsQueryable();
+        var entriesQueryable = _context.Entries
+            .Include(entry => entry.SubTopic)
+            .AsQueryable();
 
         if (!string.IsNullOrEmpty(filter.SearchText))
             entriesQueryable = entriesQueryable.Where(entry => entry.GeorgianHeadword.Contains(filter.SearchText) || entry.EnglishHeadword.Contains(filter.SearchText));
