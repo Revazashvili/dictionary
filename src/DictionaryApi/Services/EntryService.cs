@@ -125,7 +125,8 @@ internal class EntryService : IEntryService
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            await _multimediaService.RemoveAsync(entry.ImageUrl, cancellationToken);
+            if (!string.IsNullOrEmpty(entry.ImageUrl))
+                await _multimediaService.RemoveAsync(entry.ImageUrl, cancellationToken);
 
             await transaction.CommitAsync(cancellationToken);
         }
