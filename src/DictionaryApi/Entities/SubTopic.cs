@@ -7,4 +7,5 @@ public class SubTopic
     public string GeorgianName { get; set; }
     public string EnglishName { get; set; }
     public Topic Topic { get; set; }
+    public ICollection<Entry> Entries { get; set; }
 }

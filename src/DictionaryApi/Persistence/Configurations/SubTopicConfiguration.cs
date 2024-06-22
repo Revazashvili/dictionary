@@ -24,5 +24,9 @@ public class SubTopicConfiguration : IEntityTypeConfiguration<SubTopic>
         
         builder.HasOne(subTopic => subTopic.Topic)
             .WithMany(topic => topic.SubTopics);
+
+        builder.HasMany(subTopic => subTopic.Entries)
+            .WithOne(entry => entry.SubTopic)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
