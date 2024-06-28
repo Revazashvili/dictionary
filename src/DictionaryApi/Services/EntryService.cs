@@ -94,7 +94,8 @@ internal class EntryService : IEntryService
             entry.EnglishIllustrationSentence = request.EnglishIllustrationSentence;
             if (entry.ImageUrl != request.ImageUrl)
             {
-                await _multimediaService.RemoveAsync(entry.ImageUrl, cancellationToken);
+                if (!string.IsNullOrEmpty(entry.ImageUrl))
+                    await _multimediaService.RemoveAsync(entry.ImageUrl, cancellationToken);
                 entry.ImageUrl = request.ImageUrl;
             }
 
