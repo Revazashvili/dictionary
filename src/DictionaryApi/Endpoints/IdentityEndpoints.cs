@@ -99,6 +99,12 @@ public static class IdentityApiEndpoints
             return TypedResults.Ok();
         });
 
+        routeGroup.MapPut("/activate-user/{id}", Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) =>
+            ChangeUserStatus(sp, id, UserStatus.Active));
+        
+        routeGroup.MapPut("/deactivate-user/{id}", Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) =>
+            ChangeUserStatus(sp, id, UserStatus.InActive));
+        
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
             ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
         {
@@ -299,6 +305,22 @@ public static class IdentityApiEndpoints
         }
 
         return new IdentityEndpointsConventionBuilder(routeGroup);
+    }
+    
+    private static async Task<Results<Ok, ProblemHttpResult>> ChangeUserStatus(IServiceProvider sp, string id, UserStatus status)
+    {
+        var userManager = sp.GetRequiredService<UserManager<User>>();
+        
+        var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user is null)
+            return TypedResults.Problem("can't find user", statusCode: StatusCodes.Status400BadRequest);
+
+        user.Status = status;
+
+        await userManager.UpdateAsync(user);
+
+        return TypedResults.Ok();
     }
 
     private static ValidationProblem CreateValidationProblem(IdentityResult result)
