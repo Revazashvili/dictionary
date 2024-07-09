@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
+using DictionaryApi.EndpointFilters;
 using DictionaryApi.Entities;
 using DictionaryApi.Models;
 using Microsoft.AspNetCore.Authentication.BearerToken;
@@ -57,10 +58,12 @@ public static class IdentityApiEndpoints
                 .ToListAsync(cancellationToken);
 
             return TypedResults.Ok(users);
-        });
+        })
+        .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
         
         
-        routeGroup.MapGet("/user-roles", () => Task.FromResult(TypedResults.Ok(UserRoles.All)));
+        routeGroup.MapGet("/user-roles", () => Task.FromResult(TypedResults.Ok(UserRoles.All)))
+            .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
 
         routeGroup.MapPost("/add-user", async Task<Results<Ok, ValidationProblem>>
             ([FromBody] AddUserRequest addUserRequest, [FromServices] IServiceProvider sp) =>
@@ -97,13 +100,14 @@ public static class IdentityApiEndpoints
 
             //await SendConfirmationEmailAsync(user, userManager, context, email);
             return TypedResults.Ok();
-        });
+        })
+        .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
 
-        routeGroup.MapPut("/activate-user/{id}", Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) =>
-            ChangeUserStatus(sp, id, UserStatus.Active));
-        
+        routeGroup.MapPut("/activate-user/{id}", Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) 
+                => ChangeUserStatus(sp, id, UserStatus.Active)).AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
+
         routeGroup.MapPut("/deactivate-user/{id}", Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) =>
-            ChangeUserStatus(sp, id, UserStatus.InActive));
+                ChangeUserStatus(sp, id, UserStatus.InActive)).AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
         
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
             ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
