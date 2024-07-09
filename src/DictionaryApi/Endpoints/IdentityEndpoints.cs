@@ -109,6 +109,21 @@ public static class IdentityApiEndpoints
         routeGroup.MapPut("/deactivate-user/{id}", Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) =>
                 ChangeUserStatus(sp, id, UserStatus.InActive)).AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
         
+        routeGroup.MapDelete("/delete-user/{id}",
+            async Task<Results<Ok, ProblemHttpResult>> ([FromServices] IServiceProvider sp, string id) =>
+            {
+                var userManager = sp.GetRequiredService<UserManager<User>>();
+        
+                var user = await userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+                if (user is null)
+                    return TypedResults.Problem("can't find user", statusCode: StatusCodes.Status400BadRequest);
+
+                await userManager.DeleteAsync(user);
+
+                return TypedResults.Ok();
+            }).AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
+        
         routeGroup.MapPost("/login", async Task<Results<Ok<AccessTokenResponse>, EmptyHttpResult, ProblemHttpResult>>
             ([FromBody] LoginRequest login, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies, [FromServices] IServiceProvider sp) =>
         {
