@@ -83,7 +83,8 @@ public static class IdentityApiEndpoints
 
             var user = new User
             {
-                Role = addUserRequest.Role
+                Role = addUserRequest.Role,
+                Status = UserStatus.Active
             };
             await userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
