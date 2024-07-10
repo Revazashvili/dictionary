@@ -15,7 +15,7 @@ public class AdminPrivilegesEndpointFilter : IEndpointFilter
         _webHostEnvironment = webHostEnvironment;
     }
     
-    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    public async ValueTask<object> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
         if (context.HttpContext.User.Identity?.IsAuthenticated == false)
             return new UnauthorizedResult();

@@ -98,7 +98,6 @@ public static class IdentityApiEndpoints
                 return CreateValidationProblem(result);
             }
 
-            //await SendConfirmationEmailAsync(user, userManager, context, email);
             return TypedResults.Ok();
         })
         .AddEndpointFilter<SuperAdminPrivilegesEndpointFilter>();
@@ -266,7 +265,7 @@ public static class IdentityApiEndpoints
 
             var user = await userManager.FindByEmailAsync(resetRequest.Email);
 
-            if (user is null || !(await userManager.IsEmailConfirmedAsync(user)))
+            if (user is null || !await userManager.IsEmailConfirmedAsync(user))
             {
                 // Don't reveal that the user does not exist or is not confirmed, so don't return a 200 if we would have
                 // returned a 400 for an invalid code given a valid user email.
