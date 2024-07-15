@@ -93,7 +93,7 @@ public static class WebApplicationExtensions
             const string email = "dictionaryadmin@gmail.com";
             var user = new User
             {
-                Role = "admin",
+                Role = UserRoles.SuperAdmin,
                 Status = UserStatus.Active
             };
             
