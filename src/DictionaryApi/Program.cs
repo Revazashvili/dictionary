@@ -1,4 +1,5 @@
 using DictionaryApi;
+using DictionaryApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

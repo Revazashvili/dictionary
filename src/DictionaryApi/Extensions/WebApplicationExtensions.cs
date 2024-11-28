@@ -6,7 +6,7 @@ using DictionaryApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace DictionaryApi;
+namespace DictionaryApi.Extensions;
 
 internal static class WebApplicationExtensions
 {
