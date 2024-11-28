@@ -29,7 +29,7 @@ public static class IdentityApiEndpoints
         var emailSender = endpoints.ServiceProvider.GetRequiredService<IEmailSender<User>>();
         var linkGenerator = endpoints.ServiceProvider.GetRequiredService<LinkGenerator>();
 
-        string? confirmEmailEndpointName = null;
+        string confirmEmailEndpointName = null;
 
         var routeGroup = endpoints.MapGroup("identity");
 
@@ -176,7 +176,7 @@ public static class IdentityApiEndpoints
         });
 
         routeGroup.MapGet("/confirmEmail", async Task<Results<ContentHttpResult, UnauthorizedHttpResult>>
-            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string? changedEmail, [FromServices] IServiceProvider sp) =>
+            ([FromQuery] string userId, [FromQuery] string code, [FromQuery] string changedEmail, [FromServices] IServiceProvider sp) =>
         {
             var userManager = sp.GetRequiredService<UserManager<User>>();
             if (await userManager.FindByIdAsync(userId) is not { } user)
@@ -387,6 +387,6 @@ public static class IdentityApiEndpoints
     [AttributeUsage(AttributeTargets.Parameter)]
     private sealed class FromQueryAttribute : Attribute, IFromQueryMetadata
     {
-        public string? Name => null;
+        public string Name => null;
     }
 }
